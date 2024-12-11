@@ -1,6 +1,10 @@
 import pickle
+import os
 from classes.admin import Admin
 from classes.book import Book
+from classes.terminal_positioning import Positioning
+from views.book_table_top import book_table_top
+from views.main_menu import main_menu_view
 from constants import *
 
 
@@ -9,25 +13,7 @@ def main_menu_controls(user, library_initiation):
         sub_choice = input("Enter your choice: ")
         
         if sub_choice == "1": # Show all books
-            print("-" * 80)
-            print(f"Title" + " " * 25 + "| Author" + " " * 12 + "| Year| Genre" + " " * 12 + "| No|")
-            print("-" * 80)
-            
-            with open(BOOK_LOG_PATH, "rb") as book_log:
-                book_list = pickle.load(book_log)
-                
-            if len(book_list) == 0:
-                print("No books in the library.")
-            
-            elif len(book_list) <= 5:
-                for book_instance in book_list:
-                    print(book_instance)
-            
-            else:
-                for i in range(5):
-                    print(book_list[i])
-                    print("-" * 80)
-                print(f"And {len(book_list) - 5} more...")
+            book_log_functionality(user)
             
         elif sub_choice == "2":
             print("Overdue books:")
@@ -156,3 +142,135 @@ def quantity_validation():
         except ValueError:
             print("Invalid input! Please enter a valid number.")
             continue
+
+
+def split_list(lst: list, interval: int):
+    """Creates a list of nested lists which length is based on the interval
+
+    Args:
+        lst (list): any list
+        interval (int): any positive digit that is less than the length of lst
+
+    Returns:
+        list: nested lists of lists
+    """
+    return [lst[i:i + interval] for i in range(0, len(lst), interval)]
+
+
+def clear():
+    """
+    Clears the terminal screen using os.system() function
+    """
+    os.system('cls' if os.name == 'nt' else 'clear')
+
+
+def book_log_functionality(user):
+    clear()
+    line_position = Positioning()
+    
+    with open(BOOK_LOG_PATH, "rb") as book_log:
+        book_list = pickle.load(book_log)
+        
+    if len(book_list) == 0:
+        clear()
+        print("No books in the library.")
+        main_menu_view(user)
+        return
+    
+    elif len(book_list) <= 5:         
+        if line_position.empty_line == True:
+            print("")
+            
+        book_table_top()
+        
+        for book_instance in book_list:
+            print(book_instance)
+        
+        print("-" * 80)
+        print(f"\nPage 1/1\n")
+        
+    else:
+        book_log_pagination(user, line_position, book_list)
+
+
+def book_log_menu(current_page, number_of_pages):
+    print("-" * 80)
+    print(f"\nPage {current_page+1}/{number_of_pages}\n")
+    
+    if current_page == 0:
+        print(" " * 6 + "| 1. Next page |" + " " * 18 + "| 3. Last page" + " | 0. Back to Menu |" + " " * 6)
+    
+    elif current_page == number_of_pages - 1:
+        print(" " * 20 + " | 2. Previous page |" + " " * 14 + "| 0. Back to Menu |" + " " * 6)
+    
+    else:
+        print(" " * 6 + "| 1. Next page | 2. Previous page | 3. Last page | 0. Back to Menu |" + " " * 6)
+
+
+def book_log_controls(user, page_choice, current_page, number_of_pages, line_position):
+    if page_choice == "1" and current_page != number_of_pages - 1:
+        current_page += 1
+        line_position.empty_line = True
+        clear()
+        
+        return current_page
+    
+    elif page_choice == "2" and current_page != 0:
+        current_page -= 1
+        line_position.empty_line = True
+        clear()
+        
+        return current_page
+    
+    elif page_choice == "3" and current_page != number_of_pages - 1:
+        current_page = number_of_pages - 1
+        line_position.empty_line = True
+        clear()
+        
+        return current_page
+    
+    elif page_choice == "0":
+        line_position.empty_line = True
+        clear()
+        main_menu_view(user)
+        current_page = -1
+        
+        return current_page
+    
+    else:
+        clear()
+        print("Invalid choice!")
+        line_position.empty_line = False
+        
+        return current_page
+
+
+def book_log_pagination(user, line_position, book_list):
+    pagination_split = split_list(book_list, PAGINATION)
+    number_of_pages = len(pagination_split)
+    current_page = 0
+    
+    while True:
+        if line_position.empty_line == True:
+            print("")
+            
+        book_table_top()
+        
+        for book_instance in pagination_split[current_page]:
+            print(book_instance)
+        
+        if len(pagination_split[current_page]) < 6:
+            for x in range(1, 6 - len(pagination_split[current_page])):
+                print("")
+        
+        book_log_menu(current_page, number_of_pages)
+        
+        page_choice = input("\n>>> Enter your choice: ")
+        
+        current_page = book_log_controls(
+            user, page_choice, current_page, number_of_pages, line_position
+            )
+        
+        if current_page == -1:
+            current_page = 0
+            break

@@ -1,4 +1,7 @@
 BOOK_LOG_PATH = r"D:\codeacademy_darbai\library_log\pickle_files\book_log.pkl"
+
+PAGINATION = 5
+
 BOOK_GENRES = [
     "Fantasy",
     "Science Fiction",
