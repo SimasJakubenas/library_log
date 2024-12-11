@@ -1,4 +1,4 @@
-from classes import User
+from classes.user import User
 
 
 class Library_user(User):

@@ -1,6 +1,10 @@
+from classes.user import User
+
+
 class Library:
-    def __init__(self):
+    def __init__(self, user_list = []):
         self.book_list = []
+        self.user_list = user_list
     
     def add_book(self, book):
         self.book_list.append(book)
@@ -13,3 +17,13 @@ class Library:
                 print(f"{title} removed from library")
                 
         print(f"{title} not found in library")
+    
+    def add_user(self, username, password):
+        for user in self.user_list:
+            if user.username == username:
+                print("Username already exists")
+                return
+        
+        new_user = User(username, password)
+        self.user_list.append(new_user)
+        print(f"{username} added to user list")
