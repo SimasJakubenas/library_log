@@ -1,6 +1,6 @@
 import getpass
 from classes.library import Library
-from classes.admin import Admin
+from classes.admin import Admin, User
 
 
 def username_validation(library_initiation):
@@ -72,7 +72,9 @@ def register():
             
         break
     
-    library_initiation.add_user(username, password)
+    user = library_initiation.add_user(username, password)
+    
+    return user
 
 
 def login():
@@ -84,6 +86,7 @@ def login():
         username = input("Enter your username: ")
         password = getpass.getpass('Enter your password: ')
         user = library_initiation.authenticate_user(username, password)
-    
-        return user
+
+        if isinstance(user,User):
+            return user
         

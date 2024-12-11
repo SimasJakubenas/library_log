@@ -28,6 +28,8 @@ class Library:
         new_user = User(username, password)
         self.user_list.append(new_user)
         print(f"{username} added to user list")
+        
+        return new_user
     
     def authenticate_user(self, username, password):
         for user in self.user_list:
