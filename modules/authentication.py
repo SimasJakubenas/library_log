@@ -79,10 +79,11 @@ def login():
     library_initiation = Library()
     admin = Admin("Admin1", "Admin1234")
     library_initiation.user_list.append(admin)
+    
     while True:
         username = input("Enter your username: ")
         password = getpass.getpass('Enter your password: ')
-        
         user = library_initiation.authenticate_user(username, password)
+    
         return user
         

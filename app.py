@@ -1,13 +1,13 @@
 from modules.authentication import register, login
 from classes.admin import Admin
+from views.authentication_menu import authentication_menu
+from views.main_menu import main_menu_view
 
 def main():
     print("Welcome to the Library Management System!")
     
     while True:
-        print("1. Register")
-        print("2. Login")
-        print("0. Exit")
+        authentication_menu()
         choice = input("Enter your choice: ")
         
         if choice == "1":
@@ -15,18 +15,7 @@ def main():
             
         elif choice == "2":
             user = login()
-            
-            print("1. Show all books")
-            print("2. Show overdue books")
-            print("3. Book search")
-            
-            if isinstance(user, Admin):
-                print("4. Add new book")
-                print("5. Remove old book")
-            
-            else:
-                print("4. Borrow book")
-                print("5. My books")
+            main_menu_view(user)
             
             while True:
                 sub_choice = input("Enter your choice: ")
