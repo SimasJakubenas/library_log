@@ -2,8 +2,7 @@ import getpass
 from classes.library import Library
 
 
-def register():
-    library_initiation = Library()
+def username_validation(library_initiation):
     while True:
         username = input("Enter your username: ")
         
@@ -23,9 +22,11 @@ def register():
             if user_instance.username == username:
                 print("Username already exists. Please choose a different one.")
                 continue
-
-        break
         
+        return username
+
+
+def password_validation():
     while True:
         password = getpass.getpass('Enter your password: ')
         
@@ -53,7 +54,13 @@ def register():
             print("Password must contain at least one lowercase letter.")
             continue
 
-        break
+        return password
+        
+        
+def register():
+    library_initiation = Library()
+    username = username_validation(library_initiation)
+    password = password_validation()
     
     while True:
         confirm_password = getpass.getpass('Confirm your password: ')
