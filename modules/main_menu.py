@@ -1,3 +1,4 @@
+import pickle
 from classes.admin import Admin
 from classes.book import Book
 from constants import *
@@ -7,9 +8,27 @@ def main_menu_controls(user, library_initiation):
     while True:
         sub_choice = input("Enter your choice: ")
         
-        if sub_choice == "1":
-            print("All books:")
-            # Show all books
+        if sub_choice == "1": # Show all books
+            print("-" * 80)
+            print(f"Title" + " " * 25 + "| Author" + " " * 12 + "| Year| Genre" + " " * 12 + "| No|")
+            print("-" * 80)
+            
+            with open(BOOK_LOG_PATH, "rb") as book_log:
+                book_list = pickle.load(book_log)
+                
+            if len(book_list) == 0:
+                print("No books in the library.")
+            
+            elif len(book_list) <= 5:
+                for book_instance in book_list:
+                    print(book_instance)
+            
+            else:
+                for i in range(5):
+                    print(book_list[i])
+                    print("-" * 80)
+                print(f"And {len(book_list) - 5} more...")
+            
         elif sub_choice == "2":
             print("Overdue books:")
             # Show overdue books
@@ -47,12 +66,15 @@ def main_menu_controls(user, library_initiation):
 
 def title_validation():
     while True:
-        book_title = input("Enter book title: ")
+        book_title = input("Enter book title (You only have 32 characters): ")
         strippped_title = book_title.strip()
         
         if len(book_title) == 0:
             print("Title cannot be empty!")
             continue
+        
+        elif len(book_title) > 30:
+            book_title = book_title[:31]
         
         if len(strippped_title.strip()) == 0:
             print("Title cannot contain only special symbols")
@@ -69,6 +91,12 @@ def author_validation():
         if len(author) == 0:
             print("Author cannot be empty!")
             continue
+        
+        elif len(author) > 18:
+            author = author.split()[-1]
+            
+            if len(author) > 18:
+                author = author[:19]
         
         if len(strippped_author.strip()) == 0:
             print("Author cannot contain only special symbols")
@@ -105,7 +133,7 @@ def genre_validation():
             genre_names_lower.append(genre_name.lower())
         
         if genre.lower() in genre_names_lower:
-            return genre
+            return genre.title()
         
         else:
             print("Invalid genre!")
@@ -116,10 +144,10 @@ def quantity_validation():
     while True:
         
         try:
-            quantity = int(input("Enter book quantity (1-10): "))
+            quantity = int(input("Enter book quantity (1-8): "))
         
-            if quantity < 1 or quantity > 10:
-                print("Quantity must be between 1 and 10!")
+            if quantity < 1 or quantity > 8:
+                print("Quantity must be between 1 and 8!")
                 continue
             
             else:
