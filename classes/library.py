@@ -1,4 +1,5 @@
 from classes.user import User
+from classes.admin import Admin
 
 
 class Library:
@@ -27,3 +28,12 @@ class Library:
         new_user = User(username, password)
         self.user_list.append(new_user)
         print(f"{username} added to user list")
+    
+    def authenticate_user(self, username, password):
+        for user in self.user_list:
+            
+            if user.username == username and user.password == password:
+                print("Authentication successful")
+                return user
+        
+        print("Authentication failed")

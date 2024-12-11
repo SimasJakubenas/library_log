@@ -1,76 +1,68 @@
-import getpass
-from classes.library import Library
+from modules.authentication import register, login
+from classes.admin import Admin
 
-
-def username_validation(library_initiation):
-    while True:
-        username = input("Enter your username: ")
-        
-        if not username.isalnum():
-            print("Username can only contain alphanumeric characters.")
-            continue
-        
-        if len(username) < 6:
-            print("Username must be at least 6 characters long.")
-            continue
-        
-        elif len(username) > 20:
-            print("Username must be no more than 20 characters long.")
-            continue
-        
-        for user_instance in library_initiation.user_list:
-            if user_instance.username == username:
-                print("Username already exists. Please choose a different one.")
-                continue
-        
-        return username
-
-
-def password_validation():
-    while True:
-        password = getpass.getpass('Enter your password: ')
-        
-        if len(password) < 8:
-            print("Password must be at least 8 characters long.")
-            continue
-        
-        elif len(password) > 20:
-            print("Password must be no more than 20 characters long.")
-            continue
-
-        if not any(char.isdigit() for char in password):
-            print("Password must contain at least one digit.")
-            continue
-            
-        if not any(char.isalpha() for char in password):
-            print("Password must contain at least one letter.")
-            continue
-            
-        if not any(char.isupper() for char in password):
-            print("Password must contain at least one uppercase letter.")
-            continue
-            
-        if not any(char.islower() for char in password):
-            print("Password must contain at least one lowercase letter.")
-            continue
-
-        return password
-        
-        
-def register():
-    library_initiation = Library()
-    username = username_validation(library_initiation)
-    password = password_validation()
+def main():
+    print("Welcome to the Library Management System!")
     
     while True:
-        confirm_password = getpass.getpass('Confirm your password: ')
+        print("1. Register")
+        print("2. Login")
+        print("0. Exit")
+        choice = input("Enter your choice: ")
         
-        if password!= confirm_password:
-            print("Passwords do not match.")
-            continue
+        if choice == "1":
+            register()
             
-        break
-    
-    library_initiation.add_user(username, password)
+        elif choice == "2":
+            user = login()
+            
+            print("1. Show all books")
+            print("2. Show overdue books")
+            print("3. Book search")
+            
+            if isinstance(user, Admin):
+                print("4. Add new book")
+                print("5. Remove old book")
+            
+            else:
+                print("4. Borrow book")
+                print("5. My books")
+            
+            while True:
+                sub_choice = input("Enter your choice: ")
+                
+                if sub_choice == "1":
+                    print("All books:")
+                    # Show all books
+                elif sub_choice == "2":
+                    print("Overdue books:")
+                    # Show overdue books
+                elif sub_choice == "3":
+                    book_title = input("Enter book title: ")
+                    # Search for book
+                elif sub_choice == "4":
+                    if isinstance(user, Admin):
+                        book_title = input("Enter book title: ")
+                        # Add new book
+                    else:
+                        book_title = input("Enter book title: ")
+                        # Borrow book
+                elif sub_choice == "5":
+                    if isinstance(user, Admin):
+                        print("My books:")
+                        # Show my books
+                    else:
+                        print("Borrowed books:")
+                        # Show borrowed books
+                elif sub_choice == "0":
+                    break
+                else:
+                    print("Invalid choice!")
+        
+        elif choice == "0":
+            exit()
+        
+        else:
+            print("Invalid choice!")
 
-register()
+main()
