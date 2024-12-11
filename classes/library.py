@@ -1,5 +1,8 @@
+import pickle
+import os
+from constants import *
 from classes.user import User
-from classes.admin import Admin
+from classes.book import Book
 
 
 class Library:
@@ -9,7 +12,22 @@ class Library:
     
     def add_book(self, book):
         self.book_list.append(book)
-        print(f"{book.title} added to library")
+
+        if os.path.isfile(BOOK_LOG_PATH) and os.stat(BOOK_LOG_PATH).st_size != 0:
+            with open(BOOK_LOG_PATH, "rb") as pickle_in:
+                old_list:list = pickle.load(pickle_in)
+                
+                updated_list = self.book_list + old_list
+                
+            with open(BOOK_LOG_PATH, "wb") as pickle_out:
+                pickle.dump(updated_list, pickle_out)
+                
+                for x in updated_list:
+                    print(x.title)
+                
+        else:
+            with open("pickle_files/book_log.pkl", "wb") as pickle_out:
+                pickle.dump([book], pickle_out)
     
     def remove_book(self, title):
         for book in self.book_list:

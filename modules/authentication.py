@@ -58,8 +58,7 @@ def password_validation():
         return password
         
         
-def register():
-    library_initiation = Library()
+def register(library_initiation):
     username = username_validation(library_initiation)
     password = password_validation()
     
@@ -77,8 +76,7 @@ def register():
     return user
 
 
-def login():
-    library_initiation = Library()
+def login(library_initiation):
     admin = Admin("Admin1", "Admin1234")
     library_initiation.user_list.append(admin)
     
