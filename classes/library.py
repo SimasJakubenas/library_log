@@ -7,17 +7,15 @@ from classes.book import Book
 
 class Library:
     def __init__(self, user_list = []):
-        self.book_list = []
         self.user_list = user_list
     
     def add_book(self, book):
-        self.book_list.append(book)
 
         if os.path.isfile(BOOK_LOG_PATH) and os.stat(BOOK_LOG_PATH).st_size != 0:
             with open(BOOK_LOG_PATH, "rb") as pickle_in:
                 old_list:list = pickle.load(pickle_in)
                 
-                updated_list = self.book_list + old_list
+                updated_list = old_list + [book]
                 
             with open(BOOK_LOG_PATH, "wb") as pickle_out:
                 pickle.dump(updated_list, pickle_out)
@@ -26,13 +24,13 @@ class Library:
             with open(BOOK_LOG_PATH, "wb") as pickle_out:
                 pickle.dump([book], pickle_out)
     
-    def remove_book(self, title):
-        for book in self.book_list:
-            if book.title == title:
-                self.book_list.remove(book)
-                print(f"{title} removed from library")
+    # def remove_book(self, title):
+        # for book in self.book_list:
+        #     if book.title == title:
+        #         self.book_list.remove(book)
+        #         print(f"{title} removed from library")
                 
-        print(f"{title} not found in library")
+        # print(f"{title} not found in library")
     
     def add_user(self, username, password, line_position):
         new_user = User(username, password)
@@ -64,10 +62,14 @@ class Library:
         return new_user
     
     def authenticate_user(self, username, password, line_position):
-        for user in self.user_list:
+        
+        with open(USER_LOG_PATH, "rb") as pickle_in:
+            user_list:list = pickle.load(pickle_in)
             
+        for user in user_list:
             if user.username == username and user.password == password:
                 print("Authentication successful")
+                line_position.empty_line = False
                 return user
         
         print("Authentication failed")

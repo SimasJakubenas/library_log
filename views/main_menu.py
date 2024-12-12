@@ -2,7 +2,7 @@ from classes.admin import Admin
 
 
 def main_menu_view(user, line_position):
-    if line_position.empty_line == False:
+    if line_position.empty_line == True:
         print("")
     print("-" * 80)
     print(" " * 25 + "Library's Managing System Menu")

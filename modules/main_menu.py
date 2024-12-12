@@ -20,9 +20,9 @@ def main_menu_controls(user, library_initiation, line_position):
         elif sub_choice == "2":
             print("Overdue books:")
             # Show overdue books
-        elif sub_choice == "3":
-            book_title = input("Enter book title: ")
-            # Search for book
+        elif sub_choice == "3": # Search for book
+            book_search_functionality(user, line_position)
+            
         elif sub_choice == "4": # Add new book
             if isinstance(user, Admin):
                 clear()
@@ -50,6 +50,7 @@ def main_menu_controls(user, library_initiation, line_position):
                 print("Borrowed books:")
                 # Show borrowed books
         elif sub_choice == "0":
+            clear()
             break
         else:
             clear()
@@ -311,4 +312,35 @@ def book_log_pagination(user, line_position, book_list):
         
         if current_page == -1:
             current_page = 0
+            break
+
+def book_search_functionality(user, line_position):
+    while True:
+        clear()
+        if line_position.empty_line == True:
+            print("")
+        print("-" * 80)
+        print(" " * 32 + "Book Search")
+        print("-" * 80 + "\n")
+        book_title = input("Enter book title or press ENTER to go back: ")
+        clear()
+        
+        if len(book_title) != 0:
+            with open(BOOK_LOG_PATH, 'rb') as pickle_in:
+                book_log = pickle.load(pickle_in)
+            
+            matching_list = []
+            for book in book_log:
+                if book_title.lower() in book.title.lower():
+                    matching_list.append(book)
+            if len(matching_list) == 0:
+                clear()
+                print("No matching books found.")
+            else:
+                line_position.empty_line = True
+                book_log_pagination(user, line_position, matching_list)
+            
+        else:
+            clear()
+            main_menu_view(user, line_position)
             break

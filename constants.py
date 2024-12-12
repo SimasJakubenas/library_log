@@ -8,11 +8,11 @@ PAGINATION = 5
 
 BOOK_GENRES = [
     "Fantasy",
-    "Science Fiction",
+    "Scy-Fy",
     "Mystery",
     "Thriller",
     "Romance",
-    "Historical Fiction",
+    "Hist Fiction",
     "Horror",
     "Non-Fiction",
     "Biography",
