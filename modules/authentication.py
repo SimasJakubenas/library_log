@@ -1,5 +1,5 @@
 import getpass
-from classes.library import Library
+from utility.clear import clear
 from classes.admin import Admin, User
 
 
@@ -58,9 +58,10 @@ def password_validation():
         return password
         
         
-def register(library_initiation):
+def register(library_initiation, line_position):
     username = username_validation(library_initiation)
     password = password_validation()
+    clear()
     
     while True:
         confirm_password = getpass.getpass('Confirm your password: ')
@@ -76,15 +77,26 @@ def register(library_initiation):
     return user
 
 
-def login(library_initiation):
+def login(library_initiation, line_position):
     admin = Admin("Admin1", "Admin1234")
     library_initiation.user_list.append(admin)
     
-    while True:
-        username = input("Enter your username: ")
-        password = getpass.getpass('Enter your password: ')
+    for x in range(0, 3):
+        if line_position.empty_line == True:
+            print("")
+            
+        print("\n" + " " * 20 + "Welcome to the Library Management System!\n")
+        username = input("Enter your username:\n>>> ")
+        password = getpass.getpass('\nEnter your password:\n>>> ')
+        clear()
         user = library_initiation.authenticate_user(username, password)
 
         if isinstance(user,User):
+            line_position.empty_line = True
             return user
+        
+        line_position.empty_line = False
+    
+    print("Maximum login attempts reached. Please try again later.")
+    return None
         

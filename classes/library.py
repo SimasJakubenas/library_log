@@ -22,9 +22,6 @@ class Library:
             with open(BOOK_LOG_PATH, "wb") as pickle_out:
                 pickle.dump(updated_list, pickle_out)
                 
-                for x in updated_list:
-                    print(x.title)
-                
         else:
             with open("pickle_files/book_log.pkl", "wb") as pickle_out:
                 pickle.dump([book], pickle_out)

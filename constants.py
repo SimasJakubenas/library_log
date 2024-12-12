@@ -1,3 +1,6 @@
+import math
+
+
 BOOK_LOG_PATH = r"D:\codeacademy_darbai\library_log\pickle_files\book_log.pkl"
 
 PAGINATION = 5
@@ -24,3 +27,6 @@ BOOK_GENRES = [
     "Memoir",
     "Humor"
 ]
+
+# Counts a number of rows for the book genre display based on 4 columns
+BOOK_GENRES_SPLIT = math.ceil(len(BOOK_GENRES) / 4)
