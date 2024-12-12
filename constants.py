@@ -2,6 +2,7 @@ import math
 
 
 BOOK_LOG_PATH = r"D:\codeacademy_darbai\library_log\pickle_files\book_log.pkl"
+USER_LOG_PATH = r"D:\codeacademy_darbai\library_log\pickle_files\user_log.pkl"
 
 PAGINATION = 5
 

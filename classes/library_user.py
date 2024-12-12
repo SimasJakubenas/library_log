@@ -5,11 +5,15 @@ class Library_user(User):
     def __init__(self, name, username, password, have_overdue=False):
         super().__init__(name, username, password)
         self.have_overdue = have_overdue
-        self.my_books = []
+        self.borrowed_books = []
         
-        def add_book_to_basket(self, book):
-            self.my_books.append(book)
-            print(f"{book.title} has been added to basket")
+        def borrow_books(self, book):
+            if len(self.borrowed_books) < 5:
+                self.borrowed_books.append(book)
+                print(f"{book.title} has been borrowed")
+                
+            else:
+                print("You have reached your borrowing limit")
         
         def return_book(self, book):
             self.my_books.remove(book)

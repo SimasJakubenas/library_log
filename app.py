@@ -1,17 +1,19 @@
 from modules.authentication import register, login
 from modules.main_menu import main_menu_controls
-from classes.book import Book
+from modules.create_admin import create_admin
 from classes.library import Library
 from classes.terminal_positioning import Positioning
 from views.authentication_menu import authentication_menu
 from views.main_menu import main_menu_view
 from utility.clear import clear
+from constants import *
 
 
 def main():
     library_initiation = Library()
     line_position = Positioning()
-    clear()
+    
+    create_admin()
     
     while True:
         if line_position.empty_line == True:
@@ -25,8 +27,15 @@ def main():
             clear()
             line_position.empty_line = True
             user = register(library_initiation, line_position)
-            main_menu_view(user, line_position)
-            main_menu_controls(user, library_initiation, line_position)
+            
+            if user is not None:
+                main_menu_view(user, line_position)
+                main_menu_controls(user, library_initiation, line_position)
+            
+            else:
+                line_position.empty_line = False
+                clear()
+                print("Registration failed. Please try again.")
             
         elif choice == "2":
             clear()

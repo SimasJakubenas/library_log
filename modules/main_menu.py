@@ -52,7 +52,9 @@ def main_menu_controls(user, library_initiation, line_position):
         elif sub_choice == "0":
             break
         else:
+            clear()
             print("Invalid choice!")
+            main_menu_view(user, line_position)
 
 
 def title_validation(line_position):

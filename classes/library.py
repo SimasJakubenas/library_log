@@ -23,7 +23,7 @@ class Library:
                 pickle.dump(updated_list, pickle_out)
                 
         else:
-            with open("pickle_files/book_log.pkl", "wb") as pickle_out:
+            with open(BOOK_LOG_PATH, "wb") as pickle_out:
                 pickle.dump([book], pickle_out)
     
     def remove_book(self, title):
@@ -34,19 +34,36 @@ class Library:
                 
         print(f"{title} not found in library")
     
-    def add_user(self, username, password):
-        for user in self.user_list:
-            if user.username == username:
-                print("Username already exists")
-                return
-        
+    def add_user(self, username, password, line_position):
         new_user = User(username, password)
-        self.user_list.append(new_user)
-        print(f"{username} added to user list")
+        
+        if os.path.isfile(USER_LOG_PATH) and os.stat(USER_LOG_PATH).st_size != 0:
+            with open(USER_LOG_PATH, "rb") as pickle_in:
+                old_list:list = pickle.load(pickle_in)
+                
+            for user in old_list:
+                if user.username == username:
+                    line_position.empty_line = False
+                    print("Username already exists")
+                    return None
+            
+            updated_list = [new_user] + old_list
+            with open(USER_LOG_PATH, "wb") as pickle_out:
+                pickle.dump(updated_list, pickle_out)
+                line_position.empty_line = False
+                print(f"{username} added to user list")
+                
+        else:
+            with open(USER_LOG_PATH, "wb") as pickle_out:
+                pickle.dump([new_user], pickle_out)
+                line_position.empty_line = False
+                print(f"{username} added to user list")
+        
+        line_position.empty_line = True
         
         return new_user
     
-    def authenticate_user(self, username, password):
+    def authenticate_user(self, username, password, line_position):
         for user in self.user_list:
             
             if user.username == username and user.password == password:
@@ -54,3 +71,4 @@ class Library:
                 return user
         
         print("Authentication failed")
+        
