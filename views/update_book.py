@@ -3,7 +3,7 @@ from utility.clear import clear
 
 def update_book_view(page_choice, line_position, temp_book_list):
     if line_position.empty_line == True:
-            print("")
+        print("")
             
     print("-" * 80)
     print(" " * 31 + "Your selected book")

@@ -17,7 +17,7 @@ def main_menu_controls(user, library_initiation, line_position):
         sub_choice = input("Enter your choice:\n>>> ")
         
         if sub_choice == "1": # Search for book
-            line_position.empty_line == True
+            line_position.empty_line = True
             book_search_functionality(user, line_position)
             
         elif sub_choice == "2":
@@ -30,6 +30,7 @@ def main_menu_controls(user, library_initiation, line_position):
                 # Show overdue books
             
         elif sub_choice == "3": # Add new book
+            line_position.empty_line = True
             if isinstance(user, Admin):
                 clear()
                 
@@ -44,10 +45,6 @@ def main_menu_controls(user, library_initiation, line_position):
                 
                 print(f"'{book.title}' added to library")
                 main_menu_view(user, line_position)
-
-            else:
-                book_title = input("Enter book title: ")
-                # Borrow book
     
         elif sub_choice == "0":
             clear()
@@ -55,6 +52,7 @@ def main_menu_controls(user, library_initiation, line_position):
         
         else:
             clear()
+            line_position.empty_line = False
             print("Invalid choice!")
             main_menu_view(user, line_position)
 
@@ -238,7 +236,6 @@ def book_log_controls(user, page_choice, number_of_pages, line_position, book_li
     elif page_choice.lower() == "p":
         line_position.empty_line = True
         clear()
-        main_menu_view(user, line_position)
         line_position.current_page = -1
     
     elif page_choice.isdigit():
@@ -286,8 +283,7 @@ def book_log_pagination(user, line_position, book_list, book_title):
                 print("")
         
         book_log_menu(line_position, number_of_pages)
-        
-        page_choice = input("\n>>> Enter your choice: ")
+        page_choice = input("Enter your choice:\n>>> ")
         
         book_log_controls(
             user, page_choice, number_of_pages, line_position, book_list, temp_book_list, book_title
@@ -298,10 +294,12 @@ def book_log_pagination(user, line_position, book_list, book_title):
             break
 
 def book_search_functionality(user, line_position):
+    clear()
     while True:
-        clear()
+        
         if line_position.empty_line == True:
             print("")
+            
         print("-" * 80)
         print(" " * 32 + "Book Search")
         print("-" * 80 + "\n")
@@ -325,16 +323,19 @@ def book_search_functionality(user, line_position):
                 if book_title.lower() in book.title.lower():
                     matching_list.append(book)
 
-            if len(book_log) == 0:
+            if len(matching_list) == 0:
                 clear()
                 line_position.empty_line = False
                 print("No matching books found.")
+                # book_search_functionality(user, line_position)
+                
             else:
                 line_position.empty_line = True
                 book_log_pagination(user, line_position, matching_list, book_title)
 
         else:
             clear()
+            line_position.empty_line = True
             main_menu_view(user, line_position)
             break
 
@@ -404,7 +405,7 @@ def update_book_quantity(user, page_choice, line_position, book_list, temp_book_
             
             return filtered_by_text
         
-        if ammend_book_log_choice.lower() == 'p':
+        if ammend_book_log_choice.lower() == 'p': # Go back to search
             clear()
             line_position.empty_line = True
             break

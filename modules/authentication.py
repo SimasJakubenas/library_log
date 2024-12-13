@@ -2,6 +2,7 @@ import getpass
 from utility.clear import clear
 from classes.admin import Admin, User
 from views.account_creation import account_creation_view
+from views.welcome_message import welcome_message
 
 
 def username_validation(library_initiation, line_position):
@@ -94,14 +95,12 @@ def register(library_initiation, line_position):
 
 
 def login(library_initiation, line_position):
-    admin = Admin("Admin1", "Admin1234")
-    library_initiation.user_list.append(admin)
     
     for x in range(0, 3):
         if line_position.empty_line == True:
             print("")
             
-        print("\n" + " " * 20 + "Welcome to the Library Management System!\n")
+        welcome_message()
         username = input("Enter your username:\n>>> ")
         password = getpass.getpass('\nEnter your password:\n>>> ')
         clear()

@@ -5,6 +5,7 @@ from classes.library import Library
 from classes.terminal_positioning import Positioning
 from views.authentication_menu import authentication_menu
 from views.main_menu import main_menu_view
+from views.welcome_message import welcome_message
 from utility.clear import clear
 from constants import *
 
@@ -18,10 +19,10 @@ def main():
     while True:
         if line_position.empty_line == True:
             print("")
-            
-        print("\n" + " " * 20 + "Welcome to the Library Management System!\n")
+
+        welcome_message()
         authentication_menu()
-        choice = input(">>> Enter your choice: ")
+        choice = input("Enter your choice:\n>>> ")
         
         if choice == "1":
             clear()
@@ -39,7 +40,7 @@ def main():
             
         elif choice == "2":
             clear()
-            line_position.empty_line = False
+            line_position.empty_line = True
             user = login(library_initiation, line_position)
             
             if user != None:
