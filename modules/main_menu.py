@@ -1,29 +1,35 @@
 import pickle
 import os
 from classes.admin import Admin
+from classes.library_user import Library_user
 from classes.book import Book
 from classes.terminal_positioning import Positioning
 from views.book_table_top import book_table_top
 from views.main_menu import main_menu_view
 from views.adding_book import add_book_view
+from views.update_book import update_book_view
 from utility.clear import clear
 from constants import *
 
 
 def main_menu_controls(user, library_initiation, line_position):
     while True:
-        sub_choice = input("Enter your choice: ")
+        sub_choice = input("Enter your choice:\n>>> ")
         
-        if sub_choice == "1": # Show all books
-            book_log_functionality(user, line_position)
-            
-        elif sub_choice == "2":
-            print("Overdue books:")
-            # Show overdue books
-        elif sub_choice == "3": # Search for book
+        if sub_choice == "1": # Search for book
+            line_position.empty_line == True
             book_search_functionality(user, line_position)
             
-        elif sub_choice == "4": # Add new book
+        elif sub_choice == "2":
+            if isinstance(user, Admin):
+                print("Overdue books:")
+                # Show overdue books
+            
+            else:
+                print("My books:")
+                # Show overdue books
+            
+        elif sub_choice == "3": # Add new book
             if isinstance(user, Admin):
                 clear()
                 
@@ -42,16 +48,11 @@ def main_menu_controls(user, library_initiation, line_position):
             else:
                 book_title = input("Enter book title: ")
                 # Borrow book
-        elif sub_choice == "5":
-            if isinstance(user, Admin):
-                print("My books:")
-                # Show my books
-            else:
-                print("Borrowed books:")
-                # Show borrowed books
+    
         elif sub_choice == "0":
             clear()
             break
+        
         else:
             clear()
             print("Invalid choice!")
@@ -204,114 +205,96 @@ def split_list(lst: list, interval: int):
     return [lst[i:i + interval] for i in range(0, len(lst), interval)]
 
 
-def book_log_functionality(user, line_position):
-    clear()
-    
-    with open(BOOK_LOG_PATH, "rb") as book_log:
-        book_list = pickle.load(book_log)
-        
-    if len(book_list) == 0:
-        clear()
-        print("No books in the library.")
-        main_menu_view(user, line_position)
-        return
-    
-    elif len(book_list) <= 5:         
-        if line_position.empty_line == True:
-            print("")
-            
-        book_table_top()
-        
-        for book_instance in book_list:
-            print(book_instance)
-        
-        print("-" * 80)
-        print(f"\nPage 1/1\n")
-        
-    else:
-        book_log_pagination(user, line_position, book_list)
-
-
-def book_log_menu(current_page, number_of_pages):
+def book_log_menu(line_position, number_of_pages):
     print("-" * 80)
-    print(f"\nPage {current_page+1}/{number_of_pages}\n")
+    print(f"\nPage {line_position.current_page+1}/{number_of_pages}\n")
     
-    if current_page == 0:
-        print(" " * 6 + "| 1. Next page |" + " " * 18 + "| 3. Last page" + " | 0. Back to Menu |" + " " * 6)
+    if line_position.current_page == 0:
+        print(" " * 6 + "| Q. Next page |" + " " * 18 + "| E. Last page" + " | P. Back to Menu |")
     
-    elif current_page == number_of_pages - 1:
-        print(" " * 20 + " | 2. Previous page |" + " " * 14 + "| 0. Back to Menu |" + " " * 6)
+    elif line_position.current_page == number_of_pages - 1:
+        print(" " * 20 + " | W. Previous page |" + " " * 14 + "| P. Back to Menu |")
     
     else:
-        print(" " * 6 + "| 1. Next page | 2. Previous page | 3. Last page | 0. Back to Menu |" + " " * 6)
+        print(" " * 6 + "| Q. Next page | W. Previous page | E. Last page | P. Back to Menu |")
 
 
-def book_log_controls(user, page_choice, current_page, number_of_pages, line_position):
-    if page_choice == "1" and current_page != number_of_pages - 1:
-        current_page += 1
+def book_log_controls(user, page_choice, number_of_pages, line_position, book_list, temp_book_list, book_title):
+    if page_choice.lower() == "q" and line_position.current_page != number_of_pages - 1:
+        line_position.current_page += 1
         line_position.empty_line = True
         clear()
-        
-        return current_page
     
-    elif page_choice == "2" and current_page != 0:
-        current_page -= 1
+    elif page_choice.lower() == "w" and line_position.current_page != 0:
+        line_position.current_page -= 1
         line_position.empty_line = True
         clear()
-        
-        return current_page
     
-    elif page_choice == "3" and current_page != number_of_pages - 1:
-        current_page = number_of_pages - 1
+    elif page_choice.lower() == "e" and line_position.current_page != number_of_pages - 1:
+        line_position.current_page = number_of_pages - 1
         line_position.empty_line = True
         clear()
-        
-        return current_page
     
-    elif page_choice == "0":
+    elif page_choice.lower() == "p":
         line_position.empty_line = True
         clear()
         main_menu_view(user, line_position)
-        current_page = -1
+        line_position.current_page = -1
+    
+    elif page_choice.isdigit():
+        page_choice = int(page_choice) - 1
         
-        return current_page
+        if 0 <= page_choice < 5:
+            clear()
+            line_position.empty_line = True
+            filtered_book_list = update_book_quantity(
+                user, page_choice, line_position, book_list, temp_book_list, book_title
+                )
+            
+            if filtered_book_list == None:
+                return  None
+            book_log_pagination(user, line_position, filtered_book_list, book_title)
+        
+        else:
+            clear()
+            print("Invalid page number!")
+            line_position.empty_line = False
     
     else:
         clear()
         print("Invalid choice!")
         line_position.empty_line = False
-        
-        return current_page
 
 
-def book_log_pagination(user, line_position, book_list):
-    pagination_split = split_list(book_list, PAGINATION)
-    number_of_pages = len(pagination_split)
-    current_page = 0
-    
+def book_log_pagination(user, line_position, book_list, book_title):
     while True:
+        pagination_split = split_list(book_list, PAGINATION)
+        number_of_pages = len(pagination_split)
         if line_position.empty_line == True:
             print("")
             
         book_table_top()
         
-        for book_instance in pagination_split[current_page]:
-            print(book_instance)
+        temp_book_list = []
+
+        for i, book_instance in enumerate(pagination_split[line_position.current_page]):
+            temp_book_list.append(book_instance)
+            print(f"{i+1} | {book_instance}")
         
-        if len(pagination_split[current_page]) < 6:
-            for x in range(1, 6 - len(pagination_split[current_page])):
+        if len(pagination_split[line_position.current_page]) < 6:
+            for x in range(1, 6 - len(pagination_split[line_position.current_page])):
                 print("")
         
-        book_log_menu(current_page, number_of_pages)
+        book_log_menu(line_position, number_of_pages)
         
         page_choice = input("\n>>> Enter your choice: ")
         
-        current_page = book_log_controls(
-            user, page_choice, current_page, number_of_pages, line_position
+        book_log_controls(
+            user, page_choice, number_of_pages, line_position, book_list, temp_book_list, book_title
             )
         
-        if current_page == -1:
-            current_page = 0
+        if line_position.current_page == -1:
+            line_position.current_page = 0
             break
 
 def book_search_functionality(user, line_position):
@@ -322,25 +305,126 @@ def book_search_functionality(user, line_position):
         print("-" * 80)
         print(" " * 32 + "Book Search")
         print("-" * 80 + "\n")
-        book_title = input("Enter book title or press ENTER to go back: ")
+        book_title = input(
+            "Enter a word or a phrase or press ENTER to go back.\nOr type 'all' to show all books\n>>> "
+            )
         clear()
         
         if len(book_title) != 0:
             with open(BOOK_LOG_PATH, 'rb') as pickle_in:
                 book_log = pickle.load(pickle_in)
             
+            if book_title.lower() == "all":
+                clear()
+                line_position.empty_line = True
+                book_log_pagination(user, line_position, book_log, book_title)
+                break
+            
             matching_list = []
             for book in book_log:
                 if book_title.lower() in book.title.lower():
                     matching_list.append(book)
-            if len(matching_list) == 0:
+
+            if len(book_log) == 0:
                 clear()
+                line_position.empty_line = False
                 print("No matching books found.")
             else:
                 line_position.empty_line = True
-                book_log_pagination(user, line_position, matching_list)
-            
+                book_log_pagination(user, line_position, matching_list, book_title)
+
         else:
             clear()
             main_menu_view(user, line_position)
             break
+
+def update_book_quantity(user, page_choice, line_position, book_list, temp_book_list, book_title):
+    while True:
+        is_right_selection = update_book_view(page_choice, line_position, temp_book_list)
+        if is_right_selection == False:
+            book_log_pagination(user, line_position, book_list, book_title)
+        
+        ammend_book_log_choice = input("Enter your choice:\n>>> ")
+        line_position.empty_line = True
+        
+        if ammend_book_log_choice.lower() == 'q': # Adds book
+            counter_changer = 1
+            
+            if temp_book_list[page_choice].quantity < 8:
+                update_book_counter(counter_changer, temp_book_list, page_choice, line_position)
+                
+            else:
+                clear()
+                print("Cannot add book. Max qquantity is 8.")
+                line_position.empty_line = False
+        
+        if ammend_book_log_choice.lower() == 'w': # Removes book
+            counter_changer = -1
+            
+            if temp_book_list[page_choice].quantity > 0:
+                update_book_counter(counter_changer, temp_book_list, page_choice, line_position)
+                
+            else:
+                clear()
+                print("Cannot add book. Max qquantity is 8.")
+                line_position.empty_line = False
+        
+        if ammend_book_log_choice.lower() == 'e': # Deletes book
+            clear()
+            selected_book = temp_book_list[page_choice]
+            
+            with open(BOOK_LOG_PATH, "rb") as pickle_in:
+                book_list = pickle.load(pickle_in)
+
+            filtered_by_text = list(filter(
+                lambda x: x if x.title != selected_book.title else None,
+                book_list
+                ))
+            
+            if book_title != 'all':
+                filtered_by_text = list(filter(
+                    lambda x: x if book_title.lower() in x.title.lower() else None,
+                    filtered_by_text
+                    ))
+                
+                with open(BOOK_LOG_PATH, "wb") as pickle_out:
+                    clear()
+                    pickle.dump(filtered_by_text, pickle_out)
+                    print("Book remuved successfully.")
+                    line_position.empty_line = False
+                
+                return filtered_by_text
+                
+            
+            with open(BOOK_LOG_PATH, "wb") as pickle_out:
+                clear()
+                pickle.dump(filtered_by_text, pickle_out)
+                print("Book remuved successfully.")
+                line_position.empty_line = False
+            
+            return filtered_by_text
+        
+        if ammend_book_log_choice.lower() == 'p':
+            clear()
+            line_position.empty_line = True
+            break
+            
+            
+            
+def update_book_counter(counter_changer, temp_book_list, page_choice, line_position):
+    selected_book = temp_book_list[page_choice]
+    with open(BOOK_LOG_PATH, "rb") as pickle_in:
+        book_list = pickle.load(pickle_in)
+
+    clear()
+    selected_book.quantity += counter_changer
+    
+    for book in book_list:
+        if book.title == selected_book.title:
+            book.quantity = selected_book.quantity
+    
+    with open(BOOK_LOG_PATH, "wb") as pickle_out:
+        clear()
+        pickle.dump(book_list, pickle_out)
+        print("Book updated successfully.")
+        line_position.empty_line = False

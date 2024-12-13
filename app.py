@@ -39,7 +39,7 @@ def main():
             
         elif choice == "2":
             clear()
-            line_position.empty_line = True
+            line_position.empty_line = False
             user = login(library_initiation, line_position)
             
             if user != None:

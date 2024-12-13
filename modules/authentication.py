@@ -109,12 +109,10 @@ def login(library_initiation, line_position):
         user = library_initiation.authenticate_user(username, password, line_position)
 
         if isinstance(user,User):
-            line_position.empty_line = True
+            line_position.empty_line = False
             return user
         
         line_position.empty_line = False
-    
-    line_position.empty_line = True
 
     return None
         
