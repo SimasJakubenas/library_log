@@ -34,7 +34,6 @@ def main():
                 main_menu_view(user, line_position)
                 main_menu_controls(user, library_initiation, line_position)
             
-            
         elif choice == "2":
             clear()
             line_position.empty_line = True
