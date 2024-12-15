@@ -36,28 +36,21 @@ def main_menu_controls(user, library_initiation, line_position):
                 
                 
             
-        elif sub_choice == "3": # Add new book
+        elif sub_choice == "3" and isinstance(user, Admin): # Add new book
             line_position.empty_line = True
-            if isinstance(user, Admin):
-                clear()
+            clear()
+            
+            book_title = title_validation(line_position)
+            author = author_validation(line_position)
+            publication_year = publication_year_validation(line_position)
+            genre = genre_validation(line_position)
+            quantity = quantity_validation(line_position)
                 
-                book_title = title_validation(line_position)
-                author = author_validation(line_position)
-                publication_year = publication_year_validation(line_position)
-                genre = genre_validation(line_position)
-                quantity = quantity_validation(line_position)
-                    
-                book = Book(book_title, author, publication_year, genre, quantity)
-                library_initiation.add_book(book)
-                
-                print(f"'{book.title}' added to library")
-                main_menu_view(user, line_position)
-                
-            else:
-                clear()
-                line_position.empty_line = False
-                print("Invalid choice!")
-                main_menu_view(user, line_position)
+            book = Book(book_title, author, publication_year, genre, quantity)
+            library_initiation.add_book(book)
+            
+            print(f"'{book.title}' added to library")
+            main_menu_view(user, line_position)
                 
         elif sub_choice == "0":
             clear()

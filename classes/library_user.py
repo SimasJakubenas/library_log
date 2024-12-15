@@ -16,18 +16,19 @@ class Library_user(User):
         if len(self.borrowed_books) < 5:
 
             if book.quantity > 0:
-                if book not in self.borrowed_books:
-                    counter_changer = -1
-                    self.borrowed_books.append(book)
-                    updated_books = self.book_update(book, counter_changer)
-                    self.user_update()
+                for book_instance in self.borrowed_books:
+                    if book_instance.title == book.title:
+                        print(f"You already borrowed '{book.title}'")
+                        return None
                     
-                    print(f"'{book.title}' has been borrowed")
-                    
-                    return updated_books
+                counter_changer = -1
+                self.borrowed_books.append(book)
+                updated_books = self.book_update(book, counter_changer)
+                self.user_update()
                 
-                else:
-                    print(f"You already borrowed '{book.title}'")
+                print(f"'{book.title}' has been borrowed")
+                
+                return updated_books
                 
             else:
                 print(f"'{book.title}' is currently unavailable")
