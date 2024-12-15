@@ -1,7 +1,7 @@
 import pickle
 import os
 from constants import *
-from classes.user import User
+from classes.library_user import Library_user
 from classes.book import Book
 
 
@@ -33,7 +33,8 @@ class Library:
         # print(f"{title} not found in library")
     
     def add_user(self, username, password, line_position):
-        new_user = User(username, password)
+
+        new_user = Library_user(username, password)
         
         if os.path.isfile(USER_LOG_PATH) and os.stat(USER_LOG_PATH).st_size != 0:
             with open(USER_LOG_PATH, "rb") as pickle_in:
@@ -56,8 +57,6 @@ class Library:
                 pickle.dump([new_user], pickle_out)
                 line_position.empty_line = False
                 print(f"{username} added to user list")
-        
-        line_position.empty_line = True
         
         return new_user
     

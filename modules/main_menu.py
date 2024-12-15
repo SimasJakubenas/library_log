@@ -14,6 +14,7 @@ from constants import *
 
 def main_menu_controls(user, library_initiation, line_position):
     while True:
+        line_position.my_books_menu = False
         sub_choice = input("Enter your choice:\n>>> ")
         
         if sub_choice == "1": # Search for book
@@ -21,13 +22,19 @@ def main_menu_controls(user, library_initiation, line_position):
             book_search_functionality(user, line_position)
             
         elif sub_choice == "2":
+            clear()
             if isinstance(user, Admin):
                 print("Overdue books:")
                 # Show overdue books
             
-            else:
-                print("My books:")
-                # Show overdue books
+            else: # Show my books
+                line_position.empty_line = True
+                line_position.my_books_menu = True
+                user_books = user.borrowed_books
+                book_log_pagination(user, line_position, user_books)
+                main_menu_view(user, line_position)
+                
+                
             
         elif sub_choice == "3": # Add new book
             line_position.empty_line = True
@@ -45,7 +52,13 @@ def main_menu_controls(user, library_initiation, line_position):
                 
                 print(f"'{book.title}' added to library")
                 main_menu_view(user, line_position)
-    
+                
+            else:
+                clear()
+                line_position.empty_line = False
+                print("Invalid choice!")
+                main_menu_view(user, line_position)
+                
         elif sub_choice == "0":
             clear()
             break
@@ -207,14 +220,18 @@ def book_log_menu(line_position, number_of_pages):
     print("-" * 80)
     print(f"\nPage {line_position.current_page+1}/{number_of_pages}\n")
     
-    if line_position.current_page == 0:
-        print(" " * 6 + "| Q. Next page |" + " " * 18 + "| E. Last page" + " | P. Back to Menu |")
-    
-    elif line_position.current_page == number_of_pages - 1:
-        print(" " * 20 + " | W. Previous page |" + " " * 14 + "| P. Back to Menu |")
+    if number_of_pages > 1:
+        if line_position.current_page == 0:
+            print(" " * 6 + "| Q. Next page |" + " " * 18 + "| E. Last page" + " | P. Back to Search |\n")
+        
+        elif line_position.current_page == number_of_pages - 1:
+            print(" " * 20 + " | W. Previous page |" + " " * 14 + "| P. Back to Search |\n")
+        
+        else:
+            print(" " * 6 + "| Q. Next page | W. Previous page | E. Last page | P. Back to Search |\n")
     
     else:
-        print(" " * 6 + "| Q. Next page | W. Previous page | E. Last page | P. Back to Menu |")
+        print(" " * 55 + "| P. Back to Search |\n")
 
 
 def book_log_controls(user, page_choice, number_of_pages, line_position, book_list, temp_book_list, book_title):
@@ -237,6 +254,7 @@ def book_log_controls(user, page_choice, number_of_pages, line_position, book_li
         line_position.empty_line = True
         clear()
         line_position.current_page = -1
+
     
     elif page_choice.isdigit():
         page_choice = int(page_choice) - 1
@@ -250,8 +268,9 @@ def book_log_controls(user, page_choice, number_of_pages, line_position, book_li
             
             if filtered_book_list == None:
                 return  None
+            
             book_log_pagination(user, line_position, filtered_book_list, book_title)
-        
+            
         else:
             clear()
             print("Invalid page number!")
@@ -263,14 +282,14 @@ def book_log_controls(user, page_choice, number_of_pages, line_position, book_li
         line_position.empty_line = False
 
 
-def book_log_pagination(user, line_position, book_list, book_title):
+def book_log_pagination(user, line_position, book_list, book_title=None):
     while True:
         pagination_split = split_list(book_list, PAGINATION)
         number_of_pages = len(pagination_split)
         if line_position.empty_line == True:
             print("")
-            
-        book_table_top()
+        
+        book_table_top(line_position)
         
         temp_book_list = []
 
@@ -291,7 +310,9 @@ def book_log_pagination(user, line_position, book_list, book_title):
         
         if line_position.current_page == -1:
             line_position.current_page = 0
+            
             break
+        
 
 def book_search_functionality(user, line_position):
     clear()
@@ -316,7 +337,7 @@ def book_search_functionality(user, line_position):
                 clear()
                 line_position.empty_line = True
                 book_log_pagination(user, line_position, book_log, book_title)
-                break
+                continue
             
             matching_list = []
             for book in book_log:
@@ -327,7 +348,7 @@ def book_search_functionality(user, line_position):
                 clear()
                 line_position.empty_line = False
                 print("No matching books found.")
-                # book_search_functionality(user, line_position)
+                continue
                 
             else:
                 line_position.empty_line = True
@@ -341,7 +362,8 @@ def book_search_functionality(user, line_position):
 
 def update_book_quantity(user, page_choice, line_position, book_list, temp_book_list, book_title):
     while True:
-        is_right_selection = update_book_view(page_choice, line_position, temp_book_list)
+        is_right_selection = update_book_view(user, page_choice, line_position, temp_book_list)
+        
         if is_right_selection == False:
             book_log_pagination(user, line_position, book_list, book_title)
         
@@ -349,17 +371,37 @@ def update_book_quantity(user, page_choice, line_position, book_list, temp_book_
         line_position.empty_line = True
         
         if ammend_book_log_choice.lower() == 'q': # Adds book
-            counter_changer = 1
             
-            if temp_book_list[page_choice].quantity < 8:
-                update_book_counter(counter_changer, temp_book_list, page_choice, line_position)
+            if isinstance(user, Admin):
+                counter_changer = 1
                 
+                if temp_book_list[page_choice].quantity < 8:
+                    update_book_counter(counter_changer, temp_book_list, page_choice, line_position)
+                    
+                else:
+                    clear()
+                    print("Cannot add book. Max qquantity is 8.")
+                    line_position.empty_line = False
             else:
                 clear()
-                print("Cannot add book. Max qquantity is 8.")
-                line_position.empty_line = False
+                main_menu_view(user, line_position)
+                book_choice = temp_book_list[page_choice]
+                
+                if line_position.my_books_menu == False:
+                    line_position.empty_line = False
+                    updated_book_list = user.borrow_book(book_choice)
+                    
+                    return updated_book_list
+                    
+                else:
+                    line_position.empty_line = False
+                    updated_book_list = user.return_book(book_choice)
+                    
+                    break
+                
+                
         
-        if ammend_book_log_choice.lower() == 'w': # Removes book
+        elif ammend_book_log_choice.lower() == 'w' and isinstance(user, Admin): # Removes book
             counter_changer = -1
             
             if temp_book_list[page_choice].quantity > 0:
@@ -370,7 +412,7 @@ def update_book_quantity(user, page_choice, line_position, book_list, temp_book_
                 print("Cannot add book. Max qquantity is 8.")
                 line_position.empty_line = False
         
-        if ammend_book_log_choice.lower() == 'e': # Deletes book
+        elif ammend_book_log_choice.lower() == 'e' and isinstance(user, Admin): # Deletes book
             clear()
             selected_book = temp_book_list[page_choice]
             
@@ -405,11 +447,15 @@ def update_book_quantity(user, page_choice, line_position, book_list, temp_book_
             
             return filtered_by_text
         
-        if ammend_book_log_choice.lower() == 'p': # Go back to search
+        elif ammend_book_log_choice.lower() == 'p': # Go back to search
             clear()
             line_position.empty_line = True
             break
-            
+        
+        else:
+            clear()
+            print("Invalid choice!")
+            line_position.empty_line = False
             
             
 def update_book_counter(counter_changer, temp_book_list, page_choice, line_position):

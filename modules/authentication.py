@@ -1,4 +1,6 @@
 import getpass
+import os
+from dotenv import load_dotenv
 from utility.clear import clear
 from classes.admin import Admin, User
 from views.account_creation import account_creation_view
@@ -10,6 +12,21 @@ def username_validation(library_initiation, line_position):
         account_creation_view(line_position)
         username = input("Enter your username:\n>>> ")
         clear()
+        
+        # Load variables from .env file
+        load_dotenv()
+        
+        user_list = os.getenv("USER_CARD_ID_LIST").split(",")
+        
+        for user in user_list:
+            user = user.strip()
+        
+        
+        
+        if username not in user_list:
+            line_position.empty_line = False
+            print("User card ID not found. Please check your entry.")
+            continue
         
         if not username.isalnum():
             line_position.empty_line = False
@@ -88,7 +105,6 @@ def register(library_initiation, line_position):
             
         break
     
-    line_position.empty_line = False
     user = library_initiation.add_user(username, password, line_position)
     
     return user
@@ -109,6 +125,7 @@ def login(library_initiation, line_position):
 
         if isinstance(user,User):
             line_position.empty_line = False
+            
             return user
         
         line_position.empty_line = False

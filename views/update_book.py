@@ -1,7 +1,8 @@
 from utility.clear import clear
+from classes.admin import Admin
 
 
-def update_book_view(page_choice, line_position, temp_book_list):
+def update_book_view(user, page_choice, line_position, temp_book_list):
     if line_position.empty_line == True:
         print("")
             
@@ -26,6 +27,12 @@ def update_book_view(page_choice, line_position, temp_book_list):
         
     print("-" * 80)
     print(" " * 80 + "\n\n")
-    print(" " * 7 + "| Q. Add book | W. Delete book | E. Remove book | P. Back to Menu |\n")
     
+    if isinstance(user, Admin):
+        print(" " * 7 + "| Q. Add book | W. Delete book | E. Remove book | P. Back to Menu |\n")
+    else:
+        if line_position.my_books_menu == True:
+            print(" " * 7 + "| Q. Return book |" + " " * 30 + "| P. Back to Menu |\n")
+        else:
+            print(" " * 7 + "| Q. Borrow book |" + " " * 30 + "| P. Back to Menu |\n")
     return True

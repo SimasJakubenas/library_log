@@ -1,7 +1,12 @@
-def book_table_top():
+def book_table_top(line_position):
     """
     Prints the table header
     """
     print("-" * 80)
-    print(f"# | Title" + " " * 25 + "| Author" + " " * 12 + "| Year| Genre" + " " * 8 + "| No|")
+    
+    if line_position.my_books_menu == True:
+        print(f"# | Title" + " " * 25 + "| Author" + " " * 12 + "| Year| Genre" + " " * 8 + "|Due|")
+    
+    else:
+        print(f"# | Title" + " " * 25 + "| Author" + " " * 12 + "| Year| Genre" + " " * 8 + "| No|")
     print("-" * 80)

@@ -30,13 +30,10 @@ def main():
             user = register(library_initiation, line_position)
             
             if user is not None:
+                line_position.empty_line = False
                 main_menu_view(user, line_position)
                 main_menu_controls(user, library_initiation, line_position)
             
-            else:
-                line_position.empty_line = False
-                clear()
-                print("Registration failed. Please try again.")
             
         elif choice == "2":
             clear()
