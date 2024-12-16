@@ -34,6 +34,13 @@ def main_menu_controls(user, library_initiation, line_position):
                         overdue_books = [book.title for book in user_instance.borrowed_books if book.is_overdue]
                         users_with_overdue[user] = overdue_books
 
+                    if line_position.empty_line == True:
+                        print("")
+                    
+                    print("\n" + "-" * 80)
+                    print(" " * 28 + "Users with overdue books")
+                    print("-" * 80 + "\n")
+                    
                     for key, value in users_with_overdue.items():
                         print(f"{key.username}: {value}")
                         
@@ -41,11 +48,13 @@ def main_menu_controls(user, library_initiation, line_position):
                     
                     if return_to_menu == "":
                         clear()
+                        line_position.empty_line = True
                         main_menu_view(user, line_position)
-                        main_menu_controls(user, library_initiation, line_position)
+                        break
                     
                     else:
                         clear()
+                        line_position.empty_line = False
                         print(f"{Bcolors.FAIL}Invalid choice!{Bcolors.ENDC}")
      
             else: # Show my books as user
@@ -74,7 +83,7 @@ def main_menu_controls(user, library_initiation, line_position):
                 
         elif sub_choice == "0":
             clear()
-            main_menu_view(user, line_position)
+            break
         
         else:
             clear()
