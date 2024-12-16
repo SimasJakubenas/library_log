@@ -26,16 +26,13 @@ def main_menu_controls(user, library_initiation, line_position):
                 while True:
                     with open(USER_LOG_PATH, "rb") as pickle_in:
                         all_users = pickle.load(pickle_in)
-                    
+
                     only_users = list(filter(lambda x: not isinstance(x, Admin), all_users))
                     users_with_overdue = {}
                     
                     for user_instance in only_users:
                         overdue_books = [book.title for book in user_instance.borrowed_books if book.is_overdue]
-                        users_with_overdue[user] = overdue_books
-
-                    if line_position.empty_line == True:
-                        print("")
+                        users_with_overdue[user_instance] = overdue_books
                     
                     print("\n" + "-" * 80)
                     print(" " * 28 + "Users with overdue books")
@@ -54,7 +51,7 @@ def main_menu_controls(user, library_initiation, line_position):
                     
                     else:
                         clear()
-                        line_position.empty_line = False
+                        line_position.empty_line = True
                         print(f"{Bcolors.FAIL}Invalid choice!{Bcolors.ENDC}")
      
             else: # Show my books as user
