@@ -69,8 +69,10 @@ def main_menu_controls(user, library_initiation, line_position):
             book = Book(book_title, author, publication_year, genre, quantity)
             library_initiation.add_book(book)
             
+            line_position.empty_line = False
             print(f"{Bcolors.OKGREEN}'{book.title}' added to library{Bcolors.ENDC}")
             main_menu_view(user, line_position)
+            
                 
         elif sub_choice == "0":
             clear()
