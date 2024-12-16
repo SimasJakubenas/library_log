@@ -1,92 +1,135 @@
 import getpass
-from classes.library import Library
+import os
+from dotenv import load_dotenv
+from utility.clear import clear
+from classes.colors import Bcolors
 from classes.admin import Admin, User
+from views.account_creation import account_creation_view
+from views.welcome_message import welcome_message
 
 
-def username_validation(library_initiation):
+def username_validation(library_initiation, line_position):
     while True:
-        username = input("Enter your username: ")
+        account_creation_view(line_position)
+        username = input("Enter your username:\n>>> ")
+        clear()
+        
+        # Load variables from .env file
+        load_dotenv()
+        
+        user_list = os.getenv("USER_CARD_ID_LIST").split(",")
+        
+        for user in user_list:
+            user = user.strip()
+        
+        
+        
+        if username not in user_list:
+            line_position.empty_line = False
+            print(f"{Bcolors.FAIL}User card ID not found. Please check your entry{Bcolors.ENDC}")
+            continue
         
         if not username.isalnum():
-            print("Username can only contain alphanumeric characters.")
+            line_position.empty_line = False
+            print(f"{Bcolors.FAIL}Username can only contain alphanumeric characters{Bcolors.ENDC}")
             continue
         
         if len(username) < 6:
-            print("Username must be at least 6 characters long.")
+            line_position.empty_line = False
+            print(f"{Bcolors.FAIL}Username must be at least 6 characters long{Bcolors.ENDC}")
             continue
         
         elif len(username) > 20:
-            print("Username must be no more than 20 characters long.")
+            line_position.empty_line = False
+            print(f"{Bcolors.FAIL}Username must be no more than 20 characters long{Bcolors.ENDC}")
             continue
         
-        for user_instance in library_initiation.user_list:
-            if user_instance.username == username:
-                print("Username already exists. Please choose a different one.")
-                continue
+        line_position.empty_line = True
         
         return username
 
 
-def password_validation():
+def password_validation(line_position):
     while True:
-        password = getpass.getpass('Enter your password: ')
+        account_creation_view(line_position)
+        password = getpass.getpass('Enter your password:\n>>> ')
+        clear()
         
         if len(password) < 8:
-            print("Password must be at least 8 characters long.")
+            line_position.empty_line = False
+            print(f"{Bcolors.FAIL}Password must be at least 8 characters long{Bcolors.ENDC}")
             continue
         
         elif len(password) > 20:
-            print("Password must be no more than 20 characters long.")
+            line_position.empty_line = False
+            print(f"{Bcolors.FAIL}Password must be no more than 20 characters long{Bcolors.ENDC}")
             continue
 
         if not any(char.isdigit() for char in password):
-            print("Password must contain at least one digit.")
+            line_position.empty_line = False
+            print(f"{Bcolors.FAIL}Password must contain at least one digit{Bcolors.ENDC}")
             continue
             
         if not any(char.isalpha() for char in password):
-            print("Password must contain at least one letter.")
+            line_position.empty_line = False
+            print(f"{Bcolors.FAIL}Password must contain at least one letter{Bcolors.ENDC}")
             continue
             
         if not any(char.isupper() for char in password):
-            print("Password must contain at least one uppercase letter.")
+            line_position.empty_line = False
+            print(f"{Bcolors.FAIL}Password must contain at least one uppercase letter{Bcolors.ENDC}")
             continue
             
         if not any(char.islower() for char in password):
-            print("Password must contain at least one lowercase letter.")
+            line_position.empty_line = False
+            print(f"{Bcolors.FAIL}Password must contain at least one lowercase letter{Bcolors.ENDC}")
             continue
-
+        
+        line_position.empty_line = True
+        
         return password
         
         
-def register():
-    library_initiation = Library()
-    username = username_validation(library_initiation)
-    password = password_validation()
+def register(library_initiation, line_position):
+    username = username_validation(library_initiation, line_position)
+    password = password_validation(line_position)
     
     while True:
-        confirm_password = getpass.getpass('Confirm your password: ')
+        account_creation_view(line_position)
+        confirm_password = getpass.getpass('Confirm your password:\n>>> ')
+        clear()
         
         if password!= confirm_password:
-            print("Passwords do not match.")
+            line_position.empty_line = False
+            print(f"{Bcolors.FAIL}Passwords do not match{Bcolors.ENDC}")
             continue
             
         break
     
-    user = library_initiation.add_user(username, password)
+    user = library_initiation.add_user(username, password, line_position)
     
     return user
 
 
-def login():
-    library_initiation = Library()
-    admin = Admin("Admin1", "Admin1234")
-    library_initiation.user_list.append(admin)
+def login(library_initiation, line_position):
     
-    while True:
-        username = input("Enter your username: ")
-        password = getpass.getpass('Enter your password: ')
-        user = library_initiation.authenticate_user(username, password)
+    for x in range(0, 3):
+        if line_position.empty_line == True:
+            print("")
+            
+        welcome_message()
+        username = input("Enter your username:\n>>> ")
+        password = getpass.getpass('\nEnter your password:\n>>> ')
+        clear()
+            
+        user = library_initiation.authenticate_user(username, password, line_position)
 
         if isinstance(user,User):
+            line_position.empty_line = False
+            
             return user
+        
+        line_position.empty_line = False
+
+    return None
         
