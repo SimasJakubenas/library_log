@@ -52,4 +52,5 @@ def main():
             clear()
             print(f"{Bcolors.FAIL}Invalid choice!{Bcolors.ENDC}")
 
-main()
+if __name__ == "__main__":
+    main()

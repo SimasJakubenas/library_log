@@ -65,5 +65,5 @@ class Library:
                 return user
         
         print(f"{Bcolors.FAIL}Authentication failed{Bcolors.ENDC}")
-        print("Authentication failed")
+
         

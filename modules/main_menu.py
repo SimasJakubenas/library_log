@@ -1,11 +1,8 @@
 import pickle
-import os
 import datetime as dt
 from classes.colors import Bcolors
 from classes.admin import Admin
-from classes.library_user import Library_user
 from classes.book import Book
-from classes.terminal_positioning import Positioning
 from views.book_table_top import book_table_top
 from views.main_menu import main_menu_view
 from views.adding_book import add_book_view
@@ -25,11 +22,33 @@ def main_menu_controls(user, library_initiation, line_position):
             
         elif sub_choice == "2":
             clear()
-            if isinstance(user, Admin):
-                print("Overdue books:")
-                # Show overdue books
-            
-            else: # Show my books
+            if isinstance(user, Admin): # Show overdue books as Admin
+                while True:
+                    with open(USER_LOG_PATH, "rb") as pickle_in:
+                        all_users = pickle.load(pickle_in)
+                    
+                    only_users = list(filter(lambda x: not isinstance(x, Admin), all_users))
+                    users_with_overdue = {}
+                    
+                    for user_instance in only_users:
+                        overdue_books = [book.title for book in user_instance.borrowed_books if book.is_overdue]
+                        users_with_overdue[user] = overdue_books
+
+                    for key, value in users_with_overdue.items():
+                        print(f"{key.username}: {value}")
+                        
+                    return_to_menu = input("\nPress ENTER to return to main menu:\n>>> ")
+                    
+                    if return_to_menu == "":
+                        clear()
+                        main_menu_view(user, line_position)
+                        main_menu_controls(user, library_initiation, line_position)
+                    
+                    else:
+                        clear()
+                        print(f"{Bcolors.FAIL}Invalid choice!{Bcolors.ENDC}")
+     
+            else: # Show my books as user
                 line_position.empty_line = True
                 line_position.my_books_menu = True
                 book_log_pagination(user, line_position)
@@ -248,11 +267,19 @@ def book_log_controls(user, page_choice, number_of_pages, line_position, temp_bo
         line_position.empty_line = True
         clear()
         line_position.current_page = -1
-
     
     elif page_choice.isdigit():
         page_choice = int(page_choice) - 1
         
+        if not isinstance(user, Admin) and line_position.my_books_menu != True:
+            for book_instance in user.borrowed_books:
+                print(book_instance.title)
+                if book_instance.is_overdue:
+                    clear()
+                    line_position.empty_line = False
+                    print(f"{Bcolors.FAIL}You have books that are overdue. Can't borrow new books right now{Bcolors.ENDC}")
+                    return None
+            
         if 0 <= page_choice < 5:
             clear()
             line_position.empty_line = True
@@ -313,10 +340,10 @@ def book_log_pagination(user, line_position, book_title=None):
                     time_borrowed = book_instance.borrow_time
                     remaining_time = BORROWING_TIME + time_borrowed - (data - dt.datetime(1970,1,1)).total_seconds()
                     user.user_update()
+                    
                     if remaining_time < 0:
-                        
                         book_instance.is_overdue = True
-                        
+                        user.user_update()
                     if book_instance.is_overdue == True:
                         print(f"{Bcolors.FAIL}{i+1} | {book_instance} x |{Bcolors.ENDC}")
                     else:
@@ -464,7 +491,7 @@ def update_book_quantity(user, page_choice, line_position, temp_book_list, book_
         
         else:
             clear()
-            print(f"{Bcolors.OKGREEN}Invalid choice!{Bcolors.ENDC}")
+            print(f"{Bcolors.FAIL}Invalid choice!{Bcolors.ENDC}")
             line_position.empty_line = False
             
             

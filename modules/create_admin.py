@@ -31,5 +31,4 @@ def create_admin():
         with open(USER_LOG_PATH, "wb") as pickle_out:
             pickle.dump([admin_user], pickle_out)
                 
-    admin_user = Admin(os.getenv("ADMIN"), os.getenv("ADMIN_PASSWORD"))
     clear()
