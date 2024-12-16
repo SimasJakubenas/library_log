@@ -18,11 +18,7 @@ def username_validation(library_initiation, line_position):
         load_dotenv()
         
         user_list = os.getenv("USER_CARD_ID_LIST").split(",")
-        
-        for user in user_list:
-            user = user.strip()
-        
-        
+        user_list = [user.strip() for user in user_list]
         
         if username not in user_list:
             line_position.empty_line = False
