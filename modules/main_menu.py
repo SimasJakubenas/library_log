@@ -40,7 +40,7 @@ def main_menu_controls(user, library_initiation, line_position):
                     print("-" * 80 + "\n")
                     
                     print(json.dumps(users_with_overdue, indent=4))
-                    book_log_pagination(user, line_position)
+
                     return_to_menu = input("\nPress ENTER to return to main menu:\n>>> ")
                     
                     if return_to_menu == "":
@@ -80,6 +80,7 @@ def main_menu_controls(user, library_initiation, line_position):
                 
         elif sub_choice == "0":
             clear()
+            line_position.empty_line = True
             break
         
         else:
