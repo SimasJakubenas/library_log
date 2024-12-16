@@ -1,5 +1,6 @@
 import pickle
 import datetime as dt
+import json
 from classes.colors import Bcolors
 from classes.admin import Admin
 from classes.book import Book
@@ -32,15 +33,14 @@ def main_menu_controls(user, library_initiation, line_position):
                     
                     for user_instance in only_users:
                         overdue_books = [book.title for book in user_instance.borrowed_books if book.is_overdue]
-                        users_with_overdue[user_instance] = overdue_books
+                        users_with_overdue[user_instance.username] = overdue_books
                     
                     print("\n" + "-" * 80)
                     print(" " * 28 + "Users with overdue books")
                     print("-" * 80 + "\n")
                     
-                    for key, value in users_with_overdue.items():
-                        print(f"{key.username}: {value}")
-                        
+                    print(json.dumps(users_with_overdue, indent=4))
+                    book_log_pagination(user, line_position)
                     return_to_menu = input("\nPress ENTER to return to main menu:\n>>> ")
                     
                     if return_to_menu == "":
