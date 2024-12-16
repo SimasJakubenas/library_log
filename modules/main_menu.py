@@ -53,9 +53,7 @@ def main_menu_controls(user, library_initiation, line_position):
                 line_position.my_books_menu = True
                 book_log_pagination(user, line_position)
                 main_menu_view(user, line_position)
-                
-                
-            
+                   
         elif sub_choice == "3" and isinstance(user, Admin): # Add new book
             line_position.empty_line = True
             clear()
@@ -99,7 +97,7 @@ def title_validation(line_position):
             continue
         
         elif len(book_title) > 30:
-            book_title = book_title[:31]
+            book_title = book_title[:30]
         
         if len(strippped_title.strip()) == 0:
             line_position.empty_line = False
