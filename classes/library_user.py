@@ -1,4 +1,5 @@
 import pickle
+from classes.colors import Bcolors
 from classes.user import User
 from utility.clear import clear
 from constants import *
@@ -18,24 +19,27 @@ class Library_user(User):
             if book.quantity > 0:
                 for book_instance in self.borrowed_books:
                     if book_instance.title == book.title:
-                        print(f"You already borrowed '{book.title}'")
+                        print(f"{Bcolors.FAIL}You already borrowed '{book.title}{Bcolors.ENDC}")
                         return None
                     
                 counter_changer = -1
                 self.borrowed_books.append(book)
                 updated_books = self.book_update(book, counter_changer)
                 self.user_update()
+                book.borrowing_time()
                 
-                print(f"'{book.title}' has been borrowed")
+                
+                print(f"{Bcolors.OKGREEN}'{book.title}' has been borrowed{Bcolors.ENDC}")
                 
                 return updated_books
                 
             else:
-                print(f"'{book.title}' is currently unavailable")
+                print(f"{Bcolors.FAIL}'{book.title}' is currently unavailable{Bcolors.ENDC}")
             
         else:
             clear()
-            print("You have reached your borrowing limit")
+            print(f"{Bcolors.FAIL}You have reached your borrowing limit{Bcolors.ENDC}")
+
     
     def return_book(self, book):
         clear()
@@ -43,8 +47,9 @@ class Library_user(User):
         self.borrowed_books.remove(book)
         updated_books = self.book_update(book, counter_changer)
         self.user_update()
+        book.reset_borrowing_time()
 
-        print(f"'{book.title}' has been returned")
+        print(f"{Bcolors.OKGREEN}'{book.title}' has been returned{Bcolors.ENDC}")
         
         return updated_books
     

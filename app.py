@@ -1,6 +1,7 @@
 from modules.authentication import register, login
 from modules.main_menu import main_menu_controls
 from modules.create_admin import create_admin
+from classes.colors import Bcolors
 from classes.library import Library
 from classes.terminal_positioning import Positioning
 from views.authentication_menu import authentication_menu
@@ -49,6 +50,6 @@ def main():
         else:
             line_position.empty_line = False
             clear()
-            print("Invalid choice!")
+            print(f"{Bcolors.FAIL}Invalid choice!{Bcolors.ENDC}")
 
 main()

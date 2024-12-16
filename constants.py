@@ -31,3 +31,5 @@ BOOK_GENRES = [
 
 # Counts a number of rows for the book genre display based on 4 columns
 BOOK_GENRES_SPLIT = math.ceil(len(BOOK_GENRES) / 4)
+
+BORROWING_TIME = 20

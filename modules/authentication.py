@@ -2,6 +2,7 @@ import getpass
 import os
 from dotenv import load_dotenv
 from utility.clear import clear
+from classes.colors import Bcolors
 from classes.admin import Admin, User
 from views.account_creation import account_creation_view
 from views.welcome_message import welcome_message
@@ -25,22 +26,22 @@ def username_validation(library_initiation, line_position):
         
         if username not in user_list:
             line_position.empty_line = False
-            print("User card ID not found. Please check your entry.")
+            print(f"{Bcolors.FAIL}User card ID not found. Please check your entry{Bcolors.ENDC}")
             continue
         
         if not username.isalnum():
             line_position.empty_line = False
-            print("Username can only contain alphanumeric characters.")
+            print(f"{Bcolors.FAIL}Username can only contain alphanumeric characters{Bcolors.ENDC}")
             continue
         
         if len(username) < 6:
             line_position.empty_line = False
-            print("Username must be at least 6 characters long.")
+            print(f"{Bcolors.FAIL}Username must be at least 6 characters long{Bcolors.ENDC}")
             continue
         
         elif len(username) > 20:
             line_position.empty_line = False
-            print("Username must be no more than 20 characters long.")
+            print(f"{Bcolors.FAIL}Username must be no more than 20 characters long{Bcolors.ENDC}")
             continue
         
         line_position.empty_line = True
@@ -56,32 +57,32 @@ def password_validation(line_position):
         
         if len(password) < 8:
             line_position.empty_line = False
-            print("Password must be at least 8 characters long.")
+            print(f"{Bcolors.FAIL}Password must be at least 8 characters long{Bcolors.ENDC}")
             continue
         
         elif len(password) > 20:
             line_position.empty_line = False
-            print("Password must be no more than 20 characters long.")
+            print(f"{Bcolors.FAIL}Password must be no more than 20 characters long{Bcolors.ENDC}")
             continue
 
         if not any(char.isdigit() for char in password):
             line_position.empty_line = False
-            print("Password must contain at least one digit.")
+            print(f"{Bcolors.FAIL}Password must contain at least one digit{Bcolors.ENDC}")
             continue
             
         if not any(char.isalpha() for char in password):
             line_position.empty_line = False
-            print("Password must contain at least one letter.")
+            print(f"{Bcolors.FAIL}Password must contain at least one letter{Bcolors.ENDC}")
             continue
             
         if not any(char.isupper() for char in password):
             line_position.empty_line = False
-            print("Password must contain at least one uppercase letter.")
+            print(f"{Bcolors.FAIL}Password must contain at least one uppercase letter{Bcolors.ENDC}")
             continue
             
         if not any(char.islower() for char in password):
             line_position.empty_line = False
-            print("Password must contain at least one lowercase letter.")
+            print(f"{Bcolors.FAIL}Password must contain at least one lowercase letter{Bcolors.ENDC}")
             continue
         
         line_position.empty_line = True
@@ -100,7 +101,7 @@ def register(library_initiation, line_position):
         
         if password!= confirm_password:
             line_position.empty_line = False
-            print("Passwords do not match.")
+            print(f"{Bcolors.FAIL}Passwords do not match{Bcolors.ENDC}")
             continue
             
         break

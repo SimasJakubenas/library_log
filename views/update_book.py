@@ -1,5 +1,6 @@
 from utility.clear import clear
 from classes.admin import Admin
+from classes.colors import Bcolors
 
 
 def update_book_view(user, page_choice, line_position, temp_book_list):
@@ -14,7 +15,10 @@ def update_book_view(user, page_choice, line_position, temp_book_list):
         print("")
     
     try:
-        print(f"{page_choice + 1} | {temp_book_list[page_choice]}")
+        if temp_book_list[page_choice].is_overdue:
+            print(f"{Bcolors.FAIL}{page_choice + 1} | {temp_book_list[page_choice]}{Bcolors.ENDC}")
+        else:
+            print(f"{page_choice + 1} | {temp_book_list[page_choice]}")
     except IndexError:
         clear()
         line_position.empty_line = False
@@ -25,8 +29,7 @@ def update_book_view(user, page_choice, line_position, temp_book_list):
     for line in range(0, 4 - page_choice):
         print("")
         
-    print("-" * 80)
-    print(" " * 80 + "\n\n")
+    print("-" * 80 + "\n\n\n")
     
     if isinstance(user, Admin):
         print(" " * 7 + "| Q. Add book | W. Delete book | E. Remove book | P. Back to Menu |\n")

@@ -1,5 +1,7 @@
 import pickle
 import os
+import datetime as dt
+from classes.colors import Bcolors
 from classes.admin import Admin
 from classes.library_user import Library_user
 from classes.book import Book
@@ -48,7 +50,7 @@ def main_menu_controls(user, library_initiation, line_position):
             book = Book(book_title, author, publication_year, genre, quantity)
             library_initiation.add_book(book)
             
-            print(f"'{book.title}' added to library")
+            print(f"{Bcolors.OKGREEN}'{book.title}' added to library{Bcolors.ENDC}")
             main_menu_view(user, line_position)
                 
         elif sub_choice == "0":
@@ -58,7 +60,7 @@ def main_menu_controls(user, library_initiation, line_position):
         else:
             clear()
             line_position.empty_line = False
-            print("Invalid choice!")
+            print(f"{Bcolors.FAIL}Invalid choice!{Bcolors.ENDC}")
             main_menu_view(user, line_position)
 
 
@@ -72,7 +74,7 @@ def title_validation(line_position):
         
         if len(book_title) == 0:
             line_position.empty_line = False
-            print("Title cannot be empty!")
+            print(f"{Bcolors.FAIL}Title cannot be empty!{Bcolors.ENDC}")
             continue
         
         elif len(book_title) > 30:
@@ -80,7 +82,7 @@ def title_validation(line_position):
         
         if len(strippped_title.strip()) == 0:
             line_position.empty_line = False
-            print("Title cannot contain only special symbols")
+            print(f"{Bcolors.FAIL}Title cannot contain only special symbols{Bcolors.ENDC}")
             continue
         
         line_position.empty_line = True
@@ -97,7 +99,7 @@ def author_validation(line_position):
         
         if len(author) == 0:
             line_position.empty_line = False
-            print("Author cannot be empty!")
+            print(f"{Bcolors.FAIL}Author cannot be empty!{Bcolors.ENDC}")
             continue
         
         elif len(author) > 18:
@@ -108,7 +110,7 @@ def author_validation(line_position):
         
         if len(strippped_author.strip()) == 0:
             line_position.empty_line = False
-            print("Author cannot contain only special symbols")
+            print(f"{Bcolors.FAIL}Author cannot contain only special symbols{Bcolors.ENDC}")
             continue
         
         line_position.empty_line = True
@@ -126,7 +128,7 @@ def publication_year_validation(line_position):
             
             if publication_year < 1900 or publication_year > 2100:
                 line_position.empty_line = False
-                print("Invalid publication year!")
+                print(f"{Bcolors.FAIL}Invalid publication year!{Bcolors.ENDC}")
                 continue
             
             else:
@@ -136,7 +138,7 @@ def publication_year_validation(line_position):
         except ValueError:
             clear()
             line_position.empty_line = False
-            print("Invalid input! Please enter a valid year.")
+            print(f"{Bcolors.FAIL}Invalid input! Please enter a valid year{Bcolors.ENDC}")
             continue
 
 
@@ -168,7 +170,7 @@ def genre_validation(line_position):
         
         else:
             line_position.empty_line = False
-            print("Invalid genre!")
+            print(f"{Bcolors.FAIL}Invalid genre!{Bcolors.ENDC}")
             continue
 
 
@@ -181,7 +183,7 @@ def quantity_validation(line_position):
         
             if quantity < 1 or quantity > 8:
                 line_position.empty_line = False
-                print("Quantity must be between 1 and 8!")
+                print(f"{Bcolors.FAIL}Quantity must be between 1 and 8!{Bcolors.ENDC}")
                 continue
             
             else:
@@ -191,7 +193,7 @@ def quantity_validation(line_position):
         except ValueError:
             clear()
             line_position.empty_line = False
-            print("Invalid input! Please enter a valid number.")
+            print(f"{Bcolors.FAIL}Invalid input! Please enter a valid number{Bcolors.ENDC}")
             continue
 
 
@@ -260,12 +262,12 @@ def book_log_controls(user, page_choice, number_of_pages, line_position, temp_bo
             
         else:
             clear()
-            print("Invalid page number!")
+            print(f"{Bcolors.FAIL}Invalid page number!{Bcolors.ENDC}")
             line_position.empty_line = False
     
     else:
         clear()
-        print("Invalid choice!")
+        print(f"{Bcolors.FAIL}Invalid choice!{Bcolors.ENDC}")
         line_position.empty_line = False
 
 
@@ -286,7 +288,7 @@ def book_log_pagination(user, line_position, book_title=None):
                 if len(matching_list) == 0:
                     clear()
                     line_position.empty_line = False
-                    print("No matching books found.")
+                    print(f"{Bcolors.FAIL}No matching books found{Bcolors.ENDC}")
                     continue
         
         else:
@@ -301,9 +303,32 @@ def book_log_pagination(user, line_position, book_title=None):
         
         temp_book_list = []
 
-        for i, book_instance in enumerate(pagination_split[line_position.current_page]):
-            temp_book_list.append(book_instance)
-            print(f"{i+1} | {book_instance}")
+        try:
+            for i, book_instance in enumerate(pagination_split[line_position.current_page]):
+                temp_book_list.append(book_instance)
+                
+                if book_title == None and book_instance.borrow_time != None:
+                    
+                    data = dt.datetime.now()
+                    time_borrowed = book_instance.borrow_time
+                    remaining_time = BORROWING_TIME + time_borrowed - (data - dt.datetime(1970,1,1)).total_seconds()
+                    user.user_update()
+                    if remaining_time < 0:
+                        
+                        book_instance.is_overdue = True
+                        
+                    if book_instance.is_overdue == True:
+                        print(f"{Bcolors.FAIL}{i+1} | {book_instance} x |{Bcolors.ENDC}")
+                    else:
+                        print(f"{i+1} | {book_instance} {round(remaining_time):<2}|")
+
+                else:
+                    print(f"{i+1} | {book_instance} {book_instance.quantity} |")
+        except Exception:
+            clear()
+            print(f"{Bcolors.FAIL}You don't have any books, use search option to add books{Bcolors.ENDC}")
+            line_position.empty_line = False
+            break
         
         if len(pagination_split[line_position.current_page]) < 6:
             for x in range(1, 6 - len(pagination_split[line_position.current_page])):
@@ -367,7 +392,7 @@ def update_book_quantity(user, page_choice, line_position, temp_book_list, book_
                     
                 else:
                     clear()
-                    print("Cannot add book. Max qquantity is 8.")
+                    print(f"{Bcolors.FAIL}Cannot add book. Max qquantity is 8{Bcolors.ENDC}")
                     line_position.empty_line = False
             else:
                 clear()
@@ -394,7 +419,7 @@ def update_book_quantity(user, page_choice, line_position, temp_book_list, book_
                 
             else:
                 clear()
-                print("Cannot add book. Max qquantity is 8.")
+                print(f"{Bcolors.FAIL}Cannot add book. Max qquantity is 8{Bcolors.ENDC}")
                 line_position.empty_line = False
         
         elif ammend_book_log_choice.lower() == 'e' and isinstance(user, Admin): # Deletes book
@@ -418,7 +443,7 @@ def update_book_quantity(user, page_choice, line_position, temp_book_list, book_
                 with open(BOOK_LOG_PATH, "wb") as pickle_out:
                     clear()
                     pickle.dump(filtered_by_text, pickle_out)
-                    print("Book remuved successfully.")
+                    print(f"{Bcolors.OKGREEN}Book remuved successfully{Bcolors.ENDC}")
                     line_position.empty_line = False
                 
                 return filtered_by_text
@@ -427,7 +452,7 @@ def update_book_quantity(user, page_choice, line_position, temp_book_list, book_
             with open(BOOK_LOG_PATH, "wb") as pickle_out:
                 clear()
                 pickle.dump(filtered_by_text, pickle_out)
-                print("Book remuved successfully.")
+                print(f"{Bcolors.OKGREEN}Book remuved successfully{Bcolors.ENDC}")
                 line_position.empty_line = False
             
             return filtered_by_text
@@ -439,7 +464,7 @@ def update_book_quantity(user, page_choice, line_position, temp_book_list, book_
         
         else:
             clear()
-            print("Invalid choice!")
+            print(f"{Bcolors.OKGREEN}Invalid choice!{Bcolors.ENDC}")
             line_position.empty_line = False
             
             
@@ -458,5 +483,5 @@ def update_book_counter(counter_changer, temp_book_list, page_choice, line_posit
     with open(BOOK_LOG_PATH, "wb") as pickle_out:
         clear()
         pickle.dump(book_list, pickle_out)
-        print("Book updated successfully.")
+        print(f"{Bcolors.OKGREEN}Book updated successfully{Bcolors.ENDC}")
         line_position.empty_line = False
