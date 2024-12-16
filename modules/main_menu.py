@@ -74,7 +74,7 @@ def main_menu_controls(user, library_initiation, line_position):
                 
         elif sub_choice == "0":
             clear()
-            break
+            main_menu_view(user, line_position)
         
         else:
             clear()
