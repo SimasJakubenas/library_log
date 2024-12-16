@@ -145,7 +145,7 @@ def publication_year_validation(line_position):
             publication_year = int(input("Enter book publication year (yyyy): "))
             clear()
             
-            if publication_year < 1900 or publication_year > 2100:
+            if 0 <= publication_year <= 2024:
                 line_position.empty_line = False
                 print(f"{Bcolors.FAIL}Invalid publication year!{Bcolors.ENDC}")
                 continue
@@ -157,7 +157,7 @@ def publication_year_validation(line_position):
         except ValueError:
             clear()
             line_position.empty_line = False
-            print(f"{Bcolors.FAIL}Invalid input! Please enter a valid year{Bcolors.ENDC}")
+            print(f"{Bcolors.FAIL}Invalid input! Please enter year between 0 and 2024{Bcolors.ENDC}")
             continue
 
 
