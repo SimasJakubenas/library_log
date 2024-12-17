@@ -18,7 +18,7 @@ def update_book_view(user, page_choice, line_position, temp_book_list):
         if temp_book_list[page_choice].is_overdue:
             print(f"{Bcolors.FAIL}{page_choice + 1} | {temp_book_list[page_choice]}{Bcolors.ENDC}")
         else:
-            print(f"{page_choice + 1} | {temp_book_list[page_choice]}")
+            print(f"{page_choice + 1} | {temp_book_list[page_choice]} {temp_book_list[page_choice].quantity:<2}|")
     except IndexError:
         clear()
         line_position.empty_line = False
