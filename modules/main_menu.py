@@ -1,5 +1,6 @@
 import pickle
 import datetime as dt
+import json
 from classes.colors import Bcolors
 from classes.admin import Admin
 from classes.book import Book
@@ -26,26 +27,31 @@ def main_menu_controls(user, library_initiation, line_position):
                 while True:
                     with open(USER_LOG_PATH, "rb") as pickle_in:
                         all_users = pickle.load(pickle_in)
-                    
+
                     only_users = list(filter(lambda x: not isinstance(x, Admin), all_users))
                     users_with_overdue = {}
                     
                     for user_instance in only_users:
                         overdue_books = [book.title for book in user_instance.borrowed_books if book.is_overdue]
-                        users_with_overdue[user] = overdue_books
+                        users_with_overdue[user_instance.username] = overdue_books
+                    
+                    print("\n" + "-" * 80)
+                    print(" " * 28 + "Users with overdue books")
+                    print("-" * 80 + "\n")
+                    
+                    print(json.dumps(users_with_overdue, indent=4))
 
-                    for key, value in users_with_overdue.items():
-                        print(f"{key.username}: {value}")
-                        
                     return_to_menu = input("\nPress ENTER to return to main menu:\n>>> ")
                     
                     if return_to_menu == "":
                         clear()
+                        line_position.empty_line = True
                         main_menu_view(user, line_position)
-                        main_menu_controls(user, library_initiation, line_position)
+                        break
                     
                     else:
                         clear()
+                        line_position.empty_line = True
                         print(f"{Bcolors.FAIL}Invalid choice!{Bcolors.ENDC}")
      
             else: # Show my books as user
@@ -53,9 +59,7 @@ def main_menu_controls(user, library_initiation, line_position):
                 line_position.my_books_menu = True
                 book_log_pagination(user, line_position)
                 main_menu_view(user, line_position)
-                
-                
-            
+                   
         elif sub_choice == "3" and isinstance(user, Admin): # Add new book
             line_position.empty_line = True
             clear()
@@ -76,6 +80,7 @@ def main_menu_controls(user, library_initiation, line_position):
                 
         elif sub_choice == "0":
             clear()
+            line_position.empty_line = True
             break
         
         else:
@@ -99,7 +104,7 @@ def title_validation(line_position):
             continue
         
         elif len(book_title) > 30:
-            book_title = book_title[:31]
+            book_title = book_title[:30]
         
         if len(strippped_title.strip()) == 0:
             line_position.empty_line = False
@@ -147,7 +152,7 @@ def publication_year_validation(line_position):
             publication_year = int(input("Enter book publication year (yyyy): "))
             clear()
             
-            if publication_year < 1900 or publication_year > 2100:
+            if 0 <= publication_year <= 2024:
                 line_position.empty_line = False
                 print(f"{Bcolors.FAIL}Invalid publication year!{Bcolors.ENDC}")
                 continue
@@ -159,7 +164,7 @@ def publication_year_validation(line_position):
         except ValueError:
             clear()
             line_position.empty_line = False
-            print(f"{Bcolors.FAIL}Invalid input! Please enter a valid year{Bcolors.ENDC}")
+            print(f"{Bcolors.FAIL}Invalid input! Please enter year between 0 and 2024{Bcolors.ENDC}")
             continue
 
 
