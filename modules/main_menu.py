@@ -8,49 +8,41 @@ from views.book_table_top import book_table_top
 from views.main_menu import main_menu_view
 from views.adding_book import add_book_view
 from views.update_book import update_book_view
+from views.book_log_menu import book_log_menu_view
 from utility.clear import clear
 from utility.split import split_list
 from constants import *
 
-
 def main_menu_controls(user, library_initiation, line_position):
     while True:
-        line_position.my_books_menu = False
         sub_choice = input("Enter your choice:\n>>> ")
+        line_position.my_books_menu = False
+        line_position.empty_line = True
+        clear()
         
         if sub_choice == "1": # Search for book
-            line_position.empty_line = True
             book_search_functionality(user, line_position)
             
         elif sub_choice == "2":
-            clear()
             if isinstance(user, Admin): # Show overdue books as Admin
                 show_overdue_admin_view(user,line_position)
      
             else: # Show my books as user
-                line_position.empty_line = True
                 line_position.my_books_menu = True
                 book_log_pagination(user, line_position)
                 main_menu_view(user, line_position)
                    
         elif sub_choice == "3" and isinstance(user, Admin): # Add new book
-            line_position.empty_line = True
-            clear()
-            
             add_new_book(line_position, library_initiation)
             main_menu_view(user, line_position)
                 
         elif sub_choice == "0":
-            clear()
-            line_position.empty_line = True
             break
         
         else:
-            clear()
             line_position.empty_line = False
             print(f"{Bcolors.FAIL}Invalid choice!{Bcolors.ENDC}")
             main_menu_view(user, line_position)
-
 
 def title_validation(line_position):
     while True:
@@ -76,7 +68,6 @@ def title_validation(line_position):
         line_position.empty_line = True
         
         return book_title
-
 
 def author_validation(line_position):
     while True:
@@ -105,7 +96,6 @@ def author_validation(line_position):
         
         return author
 
-
 def publication_year_validation(line_position):
     while True:
         add_book_view(line_position)
@@ -128,7 +118,6 @@ def publication_year_validation(line_position):
             line_position.empty_line = False
             print(f"{Bcolors.FAIL}Invalid input! Please enter year between 0 and 2024{Bcolors.ENDC}")
             continue
-
 
 def genre_validation(line_position):
     while True:
@@ -161,7 +150,6 @@ def genre_validation(line_position):
             print(f"{Bcolors.FAIL}Invalid genre!{Bcolors.ENDC}")
             continue
 
-
 def quantity_validation(line_position):
     while True:
         add_book_view(line_position)
@@ -184,44 +172,20 @@ def quantity_validation(line_position):
             print(f"{Bcolors.FAIL}Invalid input! Please enter a valid number{Bcolors.ENDC}")
             continue
 
-
-def book_log_menu(line_position, number_of_pages):
-    print("-" * 80)
-    print(f"\nPage {line_position.current_page+1}/{number_of_pages}\n")
-    
-    if number_of_pages > 1:
-        if line_position.current_page == 0:
-            print(" " * 6 + "| Q. Next page |" + " " * 18 + "| E. Last page" + " | P. Back to Search |\n")
-        
-        elif line_position.current_page == number_of_pages - 1:
-            print(" " * 20 + " | W. Previous page |" + " " * 14 + "| P. Back to Search |\n")
-        
-        else:
-            print(" " * 6 + "| Q. Next page | W. Previous page | E. Last page | P. Back to Search |\n")
-    
-    else:
-        print(" " * 55 + "| P. Back to Search |\n")
-
-
 def book_log_controls(user, page_choice, number_of_pages, line_position, temp_book_list, book_title):
+    line_position.empty_line = True
+    clear()
+    
     if page_choice.lower() == "q" and line_position.current_page != number_of_pages - 1:
         line_position.current_page += 1
-        line_position.empty_line = True
-        clear()
     
     elif page_choice.lower() == "w" and line_position.current_page != 0:
         line_position.current_page -= 1
-        line_position.empty_line = True
-        clear()
     
     elif page_choice.lower() == "e" and line_position.current_page != number_of_pages - 1:
         line_position.current_page = number_of_pages - 1
-        line_position.empty_line = True
-        clear()
     
     elif page_choice.lower() == "p":
-        line_position.empty_line = True
-        clear()
         line_position.current_page = -1
     
     elif page_choice.isdigit():
@@ -229,30 +193,25 @@ def book_log_controls(user, page_choice, number_of_pages, line_position, temp_bo
         
         if not isinstance(user, Admin) and line_position.my_books_menu != True:
             for book_instance in user.borrowed_books:
-                print(book_instance.title)
+
                 if book_instance.is_overdue:
-                    clear()
                     line_position.empty_line = False
                     print(f"{Bcolors.FAIL}You have books that are overdue. Can't borrow new books right now{Bcolors.ENDC}")
+                    
                     return None
             
         if 0 <= page_choice < 5:
-            clear()
-            line_position.empty_line = True
             update_book_quantity(
                 user, page_choice, line_position, temp_book_list, book_title
                 )
             
         else:
-            clear()
             print(f"{Bcolors.FAIL}Invalid page number!{Bcolors.ENDC}")
             line_position.empty_line = False
     
     else:
-        clear()
         print(f"{Bcolors.FAIL}Invalid choice!{Bcolors.ENDC}")
         line_position.empty_line = False
-
 
 def book_log_pagination(user, line_position, book_title=None):
     while True:
@@ -260,7 +219,7 @@ def book_log_pagination(user, line_position, book_title=None):
             book_list = matching_list_creation(line_position, book_title)
 
             if book_list == False:
-                continue
+                break
         
         else:
             book_list = user.borrowed_books
@@ -268,17 +227,12 @@ def book_log_pagination(user, line_position, book_title=None):
         pagination_split = split_list(book_list, PAGINATION)
         number_of_pages = len(pagination_split)
         
-        book_table_top(line_position)
         temp_book_list = display_borrowed_books(user, line_position, book_title, pagination_split)
         
         if temp_book_list == False:
             break
         
-        if len(pagination_split[line_position.current_page]) < 6:
-            for x in range(1, 6 - len(pagination_split[line_position.current_page])):
-                print("")
-        
-        book_log_menu(line_position, number_of_pages)
+        book_log_menu_view(line_position, number_of_pages)
         page_choice = input("Enter your choice:\n>>> ")
         
         book_log_controls(
@@ -290,9 +244,7 @@ def book_log_pagination(user, line_position, book_title=None):
             
             break
         
-
 def book_search_functionality(user, line_position):
-    clear()
     while True:
         
         if line_position.empty_line == True:
@@ -311,11 +263,9 @@ def book_search_functionality(user, line_position):
             continue
 
         else:
-            clear()
             line_position.empty_line = True
             main_menu_view(user, line_position)
             break
-
 
 def update_book_quantity(user, page_choice, line_position, temp_book_list, book_title):
     while True:
@@ -326,6 +276,7 @@ def update_book_quantity(user, page_choice, line_position, temp_book_list, book_
         
         ammend_book_log_choice = input("Enter your choice:\n>>> ")
         line_position.empty_line = True
+        clear()
         
         if ammend_book_log_choice.lower() == 'q': # Adds book
             
@@ -345,22 +296,18 @@ def update_book_quantity(user, page_choice, line_position, temp_book_list, book_
             return filtered_by_text
         
         elif ammend_book_log_choice.lower() == 'p': # Go back to search
-            clear()
             line_position.empty_line = True
             break
         
         else:
-            clear()
             print(f"{Bcolors.FAIL}Invalid choice!{Bcolors.ENDC}")
             line_position.empty_line = False
-            
-            
+        
 def update_book_counter(counter_changer, temp_book_list, page_choice, line_position):
     selected_book = temp_book_list[page_choice]
     with open(BOOK_LOG_PATH, "rb") as pickle_in:
         book_list = pickle.load(pickle_in)
 
-    clear()
     selected_book.quantity += counter_changer
     
     for book in book_list:
@@ -368,11 +315,9 @@ def update_book_counter(counter_changer, temp_book_list, page_choice, line_posit
             book.quantity = selected_book.quantity
     
     with open(BOOK_LOG_PATH, "wb") as pickle_out:
-        clear()
         pickle.dump(book_list, pickle_out)
         print(f"{Bcolors.OKGREEN}Book updated successfully{Bcolors.ENDC}")
         line_position.empty_line = False
-
 
 def add_new_book(line_position, library_initiation):
     book_title = title_validation(line_position)
@@ -386,7 +331,6 @@ def add_new_book(line_position, library_initiation):
     
     line_position.empty_line = False
     print(f"{Bcolors.OKGREEN}'{book.title}' added to library{Bcolors.ENDC}")
-
 
 def show_overdue_admin_view(user,line_position):
     while True:
@@ -407,20 +351,18 @@ def show_overdue_admin_view(user,line_position):
         print(json.dumps(users_with_overdue, indent=4))
 
         return_to_menu = input("\nPress ENTER to return to main menu:\n>>> ")
+        clear()
         
         if return_to_menu == "":
-            clear()
-            line_position.empty_line = True
             main_menu_view(user, line_position)
             break
         
         else:
-            clear()
-            line_position.empty_line = True
+            line_position.empty_line = False
             print(f"{Bcolors.FAIL}Invalid choice!{Bcolors.ENDC}")
 
-
 def display_borrowed_books(user, line_position, book_title, pagination_split):
+    book_table_top(line_position)
     temp_book_list = []
     
     try:
@@ -428,24 +370,14 @@ def display_borrowed_books(user, line_position, book_title, pagination_split):
             temp_book_list.append(book_instance)
             
             if book_title == None and book_instance.borrow_time != None:
-                
-                data = dt.datetime.now()
-                time_borrowed = book_instance.borrow_time
-                remaining_time = BORROWING_TIME + time_borrowed - (data - dt.datetime(1970,1,1)).total_seconds()
-                user.user_update()
-                
-                if remaining_time < 0:
-                    book_instance.is_overdue = True
-                    user.user_update()
-                if book_instance.is_overdue == True:
-                    print(f"{Bcolors.FAIL}{i+1} | {book_instance} x |{Bcolors.ENDC}")
-                else:
-                    print(f"{i+1} | {book_instance} {round(remaining_time):<2}|")
-                    
-                return temp_book_list
+                overdue_check(user, book_instance, i)
 
             else:
                 print(f"{i+1} | {book_instance} {book_instance.quantity} |")
+        
+        if len(pagination_split[line_position.current_page]) < 6:
+            for x in range(1, 6 - len(pagination_split[line_position.current_page])):
+                print("")
                 
         return temp_book_list
                 
@@ -455,7 +387,6 @@ def display_borrowed_books(user, line_position, book_title, pagination_split):
         line_position.empty_line = False
         
         return False
-
 
 def matching_list_creation(line_position, book_title):
     with open(BOOK_LOG_PATH, 'rb') as pickle_in:
@@ -480,7 +411,6 @@ def matching_list_creation(line_position, book_title):
         else:
             return book_list
 
-
 def add_book(temp_book_list, page_choice, line_position):
     counter_changer = 1
                 
@@ -488,13 +418,10 @@ def add_book(temp_book_list, page_choice, line_position):
         update_book_counter(counter_changer, temp_book_list, page_choice, line_position)
         
     else:
-        clear()
         print(f"{Bcolors.FAIL}Cannot add book. Max qquantity is 8{Bcolors.ENDC}")
         line_position.empty_line = False
 
-
 def show_book(user, line_position, temp_book_list, page_choice):
-    clear()
     main_menu_view(user, line_position)
     book_choice = temp_book_list[page_choice]
     
@@ -506,7 +433,6 @@ def show_book(user, line_position, temp_book_list, page_choice):
         line_position.empty_line = False
         user.return_book(book_choice)
 
-
 def remove_book(temp_book_list, page_choice, line_position):
     counter_changer = -1
             
@@ -514,13 +440,10 @@ def remove_book(temp_book_list, page_choice, line_position):
         update_book_counter(counter_changer, temp_book_list, page_choice, line_position)
         
     else:
-        clear()
         print(f"{Bcolors.FAIL}Cannot add book. Max qquantity is 8{Bcolors.ENDC}")
         line_position.empty_line = False
 
-
 def delete_book(line_position, page_choice, temp_book_list, book_title):
-    clear()
     selected_book = temp_book_list[page_choice]
     
     with open(BOOK_LOG_PATH, "rb") as pickle_in:
@@ -552,3 +475,17 @@ def delete_book(line_position, page_choice, temp_book_list, book_title):
         line_position.empty_line = False
     
     return filtered_by_text
+
+def overdue_check(user, book_instance, i):
+    data = dt.datetime.now()
+    time_borrowed = book_instance.borrow_time
+    remaining_time = BORROWING_TIME + time_borrowed - (data - dt.datetime(1970,1,1)).total_seconds()
+    user.user_update()
+    
+    if remaining_time < 0:
+        book_instance.is_overdue = True
+        user.user_update()
+    if book_instance.is_overdue == True:
+        print(f"{Bcolors.FAIL}{i+1} | {book_instance} x |{Bcolors.ENDC}")
+    else:
+        print(f"{i+1} | {book_instance} {round(remaining_time):<2}|")
