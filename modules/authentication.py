@@ -44,7 +44,6 @@ def username_validation(library_initiation, line_position):
         
         return username
 
-
 def password_validation(line_position):
     while True:
         account_creation_view(line_position)
@@ -84,8 +83,7 @@ def password_validation(line_position):
         line_position.empty_line = True
         
         return password
-        
-        
+       
 def register(library_initiation, line_position):
     username = username_validation(library_initiation, line_position)
     password = password_validation(line_position)
@@ -106,7 +104,6 @@ def register(library_initiation, line_position):
     
     return user
 
-
 def login(library_initiation, line_position):
     
     for x in range(0, 3):
@@ -119,13 +116,11 @@ def login(library_initiation, line_position):
         clear()
             
         user = library_initiation.authenticate_user(username, password, line_position)
+        line_position.empty_line = False
 
         if isinstance(user,User):
-            line_position.empty_line = False
             
             return user
-        
-        line_position.empty_line = False
 
     return None
         
